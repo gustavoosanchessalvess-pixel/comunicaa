@@ -58,7 +58,7 @@
       $('titulo').textContent = 'Falta pouco!';
       $('subtitulo').textContent = 'Conte pra gente quem vai usar o CAA.';
       $('bloco-google').hidden = true;
-      $('bloco-credenciais').hidden = true;
+      ['bloco-email', 'bloco-senha', 'bloco-senha2'].forEach((id) => { $(id).hidden = true; });
       $('rodape-entrar').hidden = true;
       $('texto-botao').textContent = 'Começar a usar';
       $('email-google').hidden = false;

@@ -28,6 +28,7 @@
   <script src="assets/js/voz.js" defer></script>
   <script src="assets/js/catalogo.js" defer></script>
   <script src="assets/js/prancha.js" defer></script>
+  <script src="assets/js/crianca.js" defer></script>
 </head>
 <body>
   <a class="pular" href="#conteudo">Pular para o conteúdo</a>
@@ -42,11 +43,17 @@
         <p class="subtitulo">Vamos montar uma frase?</p>
       </div>
       <div class="topo-acoes">
-        <button id="abrir-ajustes" class="botao-icone" type="button" title="Ajustes de voz" aria-label="Ajustes de voz">
-          <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+        <!-- Só no Modo Adulto: ajustes e o botão que entrega o aparelho para a criança. -->
+        <button id="abrir-ajustes" class="botao-icone so-adulto" type="button" title="Ajustes" aria-label="Ajustes de voz e do Modo Criança">
+          <i class="bi bi-gear-fill" aria-hidden="true"></i>
         </button>
-        <button id="foco" class="botao-foco" type="button" aria-pressed="false">
-          <i class="bi bi-stars" aria-hidden="true"></i><span>Modo Foco</span><span class="interruptor" aria-hidden="true"></span>
+        <button id="ligar-crianca" class="botao roxo pequeno so-adulto" type="button">
+          <i class="bi bi-emoji-smile-fill" aria-hidden="true"></i> Modo Criança
+        </button>
+        <!-- Só no Modo Criança: cadeado dos pais (segure 2 segundos para sair). -->
+        <button id="cadeado" class="cadeado so-crianca" type="button" title="Adulto: segure 2 segundos para sair" aria-label="Sair do Modo Criança: segure por 2 segundos">
+          <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/></svg>
+          <i class="bi bi-lock-fill" aria-hidden="true"></i>
         </button>
       </div>
     </header>
@@ -60,7 +67,7 @@
           <button id="falar" class="botao verde falar" type="button" disabled><i class="bi bi-play-fill" aria-hidden="true"></i><span>Falar</span></button>
           <button id="apagar" class="botao laranja" type="button" disabled aria-label="Apagar a última figura"><i class="bi bi-backspace-fill" aria-hidden="true"></i><span>Apagar</span></button>
           <button id="limpar" class="botao vermelho" type="button" disabled aria-label="Limpar a frase inteira"><i class="bi bi-trash3-fill" aria-hidden="true"></i><span>Limpar</span></button>
-          <button id="salvar" class="botao azul salvar" type="button" disabled><i class="bi bi-check-lg" aria-hidden="true"></i><span>Salvar</span></button>
+          <button id="salvar" class="botao azul salvar so-adulto" type="button" disabled><i class="bi bi-check-lg" aria-hidden="true"></i><span>Salvar</span></button>
         </div>
         <p id="frase-texto" class="frase-texto" aria-live="polite"></p>
       </section>
@@ -71,8 +78,22 @@
         <div id="atalhos-lista" class="atalhos-lista"></div>
       </div>
 
-      <!-- BUSCA E CATEGORIAS -->
-      <section class="ferramentas" aria-label="Encontrar figuras">
+      <!-- MODO CRIANÇA: pastas grandes e figuras em páginas (crianca.js) -->
+      <section class="crianca-area so-crianca" aria-labelledby="crianca-titulo">
+        <div class="crianca-titulo">
+          <button id="crianca-voltar" class="botao azul" type="button" hidden><i class="bi bi-arrow-left" aria-hidden="true"></i> Voltar</button>
+          <h2 id="crianca-titulo">Escolha um assunto</h2>
+        </div>
+        <div id="grade-crianca" class="grade-crianca"></div>
+        <div class="paginas">
+          <button id="crianca-anterior" class="botao laranja" type="button" aria-label="Página anterior"><i class="bi bi-chevron-left" aria-hidden="true"></i> Antes</button>
+          <div id="crianca-pontos" class="pontos"></div>
+          <button id="crianca-proxima" class="botao laranja" type="button" aria-label="Próxima página">Mais <i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+        </div>
+      </section>
+
+      <!-- BUSCA E CATEGORIAS (Modo Adulto) -->
+      <section class="ferramentas so-adulto" aria-label="Encontrar figuras">
         <label class="busca" for="busca">
           <span class="so-leitor">Buscar uma figura</span>
           <i class="bi bi-search" aria-hidden="true"></i>
@@ -82,13 +103,13 @@
       </section>
 
       <!-- GRADE DE FIGURAS PECS -->
-      <section aria-label="Figuras de comunicação">
+      <section class="so-adulto" aria-label="Figuras de comunicação">
         <p id="contador" class="texto-2 pequeno" aria-live="polite"></p>
         <div id="grade" class="grade"></div>
         <div class="mais"><button id="mostrar-mais" class="botao neutro" type="button" hidden>Mostrar mais figuras</button></div>
       </section>
 
-      <details class="legenda">
+      <details class="legenda so-adulto">
         <summary>O que significam as cores das bordas?</summary>
         <div id="legenda-lista" class="legenda-lista"></div>
       </details>
@@ -101,7 +122,7 @@
   <dialog id="ajustes-voz" class="folha" aria-labelledby="titulo-ajustes">
     <div class="folha-conteudo">
       <div class="folha-topo">
-        <h2 id="titulo-ajustes">Ajustes de voz</h2>
+        <h2 id="titulo-ajustes">Ajustes</h2>
         <button id="fechar-ajustes" class="botao-icone" type="button" aria-label="Fechar"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
       </div>
       <div class="campo">
@@ -116,6 +137,15 @@
           <button type="button" data-valor="normal" aria-pressed="true">Normal</button>
           <button type="button" data-valor="rapido" aria-pressed="false">Rápido</button>
         </div>
+      </div>
+      <div class="campo">
+        <span class="rotulo" id="rotulo-nivel">Nível de apoio do Modo Criança</span>
+        <div id="nivel-apoio" class="segmentos" role="group" aria-labelledby="rotulo-nivel">
+          <button type="button" data-valor="3" aria-pressed="false">Muito</button>
+          <button type="button" data-valor="2" aria-pressed="true">Médio</button>
+          <button type="button" data-valor="1" aria-pressed="false">Pouco</button>
+        </div>
+        <span class="ajuda">Muito apoio = poucas figuras por página, bem grandes. Pouco apoio = mais figuras na tela.</span>
       </div>
       <button id="voz-ao-tocar" class="linha-ajuste" type="button" aria-pressed="true">
         <span>Falar ao tocar na figura</span><span class="interruptor" aria-hidden="true"></span>

@@ -33,54 +33,28 @@
     <header class="topo">
       <div>
         <h1 class="saudacao">Dicionário</h1>
-        <p class="subtitulo">Cada comunicação tem seu valor.</p>
+        <p class="subtitulo">O que foi comunicado, dia a dia.</p>
       </div>
       <div class="topo-acoes">
-        <button id="foco" class="botao-foco" type="button" aria-pressed="false">
-          <i class="bi bi-stars" aria-hidden="true"></i><span>Modo Foco</span><span class="interruptor" aria-hidden="true"></span>
-        </button>
       </div>
     </header>
 
     <main id="conteudo">
-      <!-- NÚMEROS DO PROGRESSO -->
-      <section class="numeros" aria-label="Resumo do progresso">
-        <div class="numero frases"><i class="bi bi-chat-square-heart-fill" aria-hidden="true"></i><strong id="n-frases">0</strong><span>frases salvas</span></div>
-        <div class="numero fogo"><i class="bi bi-fire" aria-hidden="true"></i><strong id="n-sequencia">0</strong><span>dias seguidos</span></div>
-        <div class="numero media"><i class="bi bi-bar-chart-fill" aria-hidden="true"></i><strong id="n-media">0</strong><span>figuras por frase</span></div>
-        <div class="numero vocab"><i class="bi bi-book-half" aria-hidden="true"></i><strong id="n-vocabulario">0</strong><span>figuras diferentes</span></div>
+      <!-- RESUMO EM LINGUAGEM SIMPLES (sem gráficos, a pedido das profissionais) -->
+      <section class="painel" aria-labelledby="titulo-resumo">
+        <h2 id="titulo-resumo">Resumo</h2>
+        <p id="resumo" class="resumo-texto">Carregando…</p>
+        <p class="texto-2 pequeno">Registro de uso para a família e os profissionais. Não é uma avaliação clínica.</p>
       </section>
 
-      <div class="colunas">
-        <section class="painel" aria-labelledby="titulo-semana">
-          <h2 id="titulo-semana">Últimos 7 dias</h2>
-          <p class="texto-2 pequeno">Quantas frases foram salvas em cada dia.</p>
-          <div id="semana" class="semana"></div>
-        </section>
-        <section class="painel" aria-labelledby="titulo-tipos">
-          <h2 id="titulo-tipos">Tipos de frase</h2>
-          <p class="texto-2 pequeno">O que a pessoa mais comunicou.</p>
-          <div id="tipos" class="tipos"></div>
-        </section>
-      </div>
-
       <section class="painel" aria-labelledby="titulo-vocabulario">
-        <div class="painel-cabecalho">
-          <div>
-            <h2 id="titulo-vocabulario">Meu dicionário</h2>
-            <p class="texto-2 pequeno">As figuras mais usadas nas frases.</p>
-          </div>
-        </div>
+        <h2 id="titulo-vocabulario">Figuras que mais aparecem</h2>
+        <p class="texto-2 pequeno">Toque numa figura para ouvir.</p>
         <div id="vocabulario" class="vocabulario"></div>
       </section>
 
       <section class="painel" aria-labelledby="titulo-historico">
-        <div class="painel-cabecalho">
-          <div>
-            <h2 id="titulo-historico">Histórico de frases</h2>
-            <p class="texto-2 pequeno">Registro de uso. Não é uma avaliação clínica.</p>
-          </div>
-        </div>
+        <h2 id="titulo-historico">Histórico de frases</h2>
         <div id="historico" class="historico"></div>
         <div class="mais"><button id="mais-historico" class="botao neutro" type="button" hidden>Ver frases mais antigas</button></div>
       </section>

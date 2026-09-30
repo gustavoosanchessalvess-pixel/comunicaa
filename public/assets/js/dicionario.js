@@ -1,33 +1,27 @@
 // =====================================================================
-// dicionario.js · TELA "DICIONÁRIO" (progresso + histórico de frases)
+// dicionario.js · TELA "DICIONÁRIO" (para o responsável acompanhar)
 // ---------------------------------------------------------------------
 // Busca no banco as frases da pessoa logada (função minhas_frases, que
-// junta FRASE + CRIA + CONTEM + PALAVRAS_PECS) e mostra:
-//   * números do progresso (frases, dias seguidos, média, vocabulário);
-//   * gráfico dos últimos 7 dias;
-//   * tipos de frase (pedido, pergunta, necessidade, expressão);
-//   * "meu dicionário": as figuras mais usadas;
-//   * o histórico, com botões Ouvir e Apagar.
+// junta FRASE + CRIA + CONTEM + PALAVRAS_PECS) e mostra, em linguagem
+// simples:
+//   * um resumo em frase ("Nos últimos 7 dias, foram 5 frases...");
+//   * "Figuras que mais aparecem" (o dicionário pessoal);
+//   * o histórico, separado por dia, com os botões Ouvir e Apagar.
 //
-// Parábola: é o "boletim" gentil do aluno. Não dá nota nem diz
-// "aprendeu"; só mostra o caminho que a pessoa já percorreu, para a
-// família e os profissionais acompanharem a evolução.
+// Sem gráficos, notas ou comparações: foi o retorno das profissionais
+// que acompanham o projeto (o foco é o CONTEXTO do dia a dia, não número).
+//
+// Parábola: é o "caderninho de recados" entre a criança e a família.
 // =====================================================================
 'use strict';
 
 (function () {
-  const TIPOS = {
-    pedido: 'Pedidos',
-    pergunta: 'Perguntas',
-    necessidade: 'Necessidades',
-    expressao: 'Expressões',
-  };
+  const TIPOS = { pedido: 'Pedido', pergunta: 'Pergunta', necessidade: 'Necessidade', expressao: 'Expressão' };
   const POR_LOTE = 20;
 
   let catalogo;
   let frases = [];
   let limiteHistorico = POR_LOTE;
-
   const $ = (id) => document.getElementById(id);
 
   CAA.iniciarPaginaInterna('dicionario', async () => {
@@ -44,133 +38,82 @@
   });
 
   function desenharTudo() {
-    desenharNumeros();
-    desenharSemana();
-    desenharTipos();
+    desenharResumo();
     desenharVocabulario();
     desenharHistorico();
   }
 
-  // ------------------------------------------------------------------
-  // NÚMEROS DO TOPO
-  // ------------------------------------------------------------------
-  function desenharNumeros() {
-    const totalFiguras = frases.reduce((soma, f) => soma + f.qtd_palavras, 0);
-    const media = frases.length ? totalFiguras / frases.length : 0;
-    const diferentes = new Set(frases.flatMap((f) => f.palavras.map((p) => p.id_palavra))).size;
-
-    $('n-frases').textContent = frases.length;
-    $('n-sequencia').textContent = diasSeguidos();
-    $('n-media').textContent = media.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
-    $('n-vocabulario').textContent = diferentes;
+  // Figuras mais usadas, da mais para a menos usada.
+  function maisUsadas(limite) {
+    const usos = new Map();
+    frases.forEach((f) => f.palavras.forEach((p) => usos.set(p.id_palavra, (usos.get(p.id_palavra) || 0) + 1)));
+    return [...usos.entries()].sort((a, b) => b[1] - a[1]).slice(0, limite).map(([id]) => id);
   }
 
-  // Quantos dias seguidos (até hoje ou ontem) têm pelo menos uma frase.
-  // É a "chama" do Duolingo: incentiva usar um pouquinho todo dia.
-  function diasSeguidos() {
-    const dias = new Set(frases.map((f) => CAA.chaveDia(f.data_frase)));
-    const cursor = new Date();
-    if (!dias.has(CAA.chaveDia(cursor))) cursor.setDate(cursor.getDate() - 1); // ainda dá tempo hoje
-    let contagem = 0;
-    while (dias.has(CAA.chaveDia(cursor))) {
-      contagem += 1;
-      cursor.setDate(cursor.getDate() - 1);
+  // ------------------------------------------------------------------
+  // RESUMO EM UMA FRASE (linguagem simples, sem gráfico)
+  // ------------------------------------------------------------------
+  function desenharResumo() {
+    const caixa = $('resumo');
+    if (!frases.length) {
+      caixa.textContent = 'Ainda não há frases salvas. No Modo Criança, cada frase falada aparece aqui.';
+      return;
     }
-    return contagem;
+    const semana = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const recentes = frases.filter((f) => new Date(f.data_frase).getTime() >= semana).length;
+    const top = maisUsadas(3).map((id) => (catalogo.palavras.get(id) || {}).texto).filter(Boolean);
+    let texto = recentes
+      ? 'Nos últimos 7 dias, ' + (recentes === 1 ? 'foi feita 1 frase' : 'foram feitas ' + recentes + ' frases') + '.'
+      : 'Nenhuma frase nos últimos 7 dias.';
+    if (top.length) texto += ' As figuras que mais aparecem são: ' + top.join(', ') + '.';
+    caixa.textContent = texto;
   }
 
   // ------------------------------------------------------------------
-  // GRÁFICO DA SEMANA (barras feitas só com CSS)
-  // ------------------------------------------------------------------
-  function desenharSemana() {
-    const caixa = $('semana');
-    caixa.replaceChildren();
-    const porDia = {};
-    frases.forEach((f) => { const dia = CAA.chaveDia(f.data_frase); porDia[dia] = (porDia[dia] || 0) + 1; });
-
-    const dias = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      dias.push(d);
-    }
-    const maximo = Math.max(1, ...dias.map((d) => porDia[CAA.chaveDia(d)] || 0));
-
-    dias.forEach((d, indice) => {
-      const quantidade = porDia[CAA.chaveDia(d)] || 0;
-      const coluna = CAA.el('div', 'dia' + (indice === 6 ? ' hoje' : ''));
-      const fundo = CAA.el('div', 'barra-fundo');
-      const barra = CAA.el('div', 'barra');
-      barra.style.height = '0%';
-      fundo.append(barra);
-      const nomeDia = indice === 6 ? 'Hoje' : d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
-      coluna.append(fundo, CAA.el('b', '', quantidade), CAA.el('small', '', nomeDia));
-      coluna.setAttribute('aria-label', nomeDia + ': ' + quantidade + ' frases');
-      caixa.append(coluna);
-      // Anima a barra crescendo depois que ela aparece na tela.
-      requestAnimationFrame(() => requestAnimationFrame(() => { barra.style.height = Math.max(quantidade ? 8 : 0, (quantidade / maximo) * 100) + '%'; }));
-    });
-  }
-
-  // ------------------------------------------------------------------
-  // TIPOS DE FRASE (coluna tipo_frase da tabela FRASE)
-  // ------------------------------------------------------------------
-  function desenharTipos() {
-    const caixa = $('tipos');
-    caixa.replaceChildren();
-    const contagem = { pedido: 0, pergunta: 0, necessidade: 0, expressao: 0 };
-    frases.forEach((f) => { if (f.tipo_frase in contagem) contagem[f.tipo_frase] += 1; });
-    const maximo = Math.max(1, ...Object.values(contagem));
-
-    Object.entries(TIPOS).forEach(([tipo, nome]) => {
-      const linha = CAA.el('div', 'tipo-linha t-' + tipo);
-      const trilho = CAA.el('div', 'trilho');
-      const barra = CAA.el('i');
-      barra.style.width = (contagem[tipo] / maximo) * 100 + '%';
-      trilho.append(barra);
-      linha.append(CAA.el('span', '', nome), trilho, CAA.el('b', '', contagem[tipo]));
-      caixa.append(linha);
-    });
-  }
-
-  // ------------------------------------------------------------------
-  // MEU DICIONÁRIO: figuras mais usadas
+  // FIGURAS QUE MAIS APARECEM
   // ------------------------------------------------------------------
   function desenharVocabulario() {
     const caixa = $('vocabulario');
     caixa.replaceChildren();
-    const usos = new Map();
-    frases.forEach((f) => f.palavras.forEach((p) => usos.set(p.id_palavra, (usos.get(p.id_palavra) || 0) + 1)));
-
-    const maisUsadas = [...usos.entries()].sort((a, b) => b[1] - a[1]).slice(0, 18);
-    if (!maisUsadas.length) {
-      caixa.append(estadoVazio('Suas figuras favoritas vão aparecer aqui.'));
+    const ids = maisUsadas(18);
+    if (!ids.length) {
+      caixa.append(estadoVazio('As figuras mais usadas vão aparecer aqui.'));
       return;
     }
-    maisUsadas.forEach(([id, vezes]) => {
+    ids.forEach((id) => {
       const palavra = catalogo.palavras.get(id);
       if (!palavra) return;
-      const item = CAA.el('div', 'palavra-usada cl-' + palavra.classe);
+      const item = CAA.el('button', 'palavra-usada cl-' + palavra.classe);
+      item.type = 'button';
+      item.title = 'Ouvir ' + palavra.texto;
       const imagem = document.createElement('img');
       imagem.src = palavra.imagem;
       imagem.alt = '';
       imagem.loading = 'lazy';
-      const selo = CAA.el('span', 'vezes', vezes + '×');
-      selo.setAttribute('aria-label', 'usada ' + vezes + ' vezes');
-      item.append(selo, imagem, CAA.el('strong', '', palavra.texto));
+      item.append(imagem, CAA.el('strong', '', palavra.texto));
+      item.addEventListener('click', () => CAA.voz.falar(CAA.voz.textoParaFala(palavra.texto)));
       caixa.append(item);
     });
   }
 
   // ------------------------------------------------------------------
-  // HISTÓRICO DE FRASES
+  // HISTÓRICO, SEPARADO POR DIA
   // ------------------------------------------------------------------
+  function nomeDoDia(iso) {
+    const chave = CAA.chaveDia(iso);
+    const hoje = new Date();
+    const ontem = new Date(); ontem.setDate(hoje.getDate() - 1);
+    if (chave === CAA.chaveDia(hoje)) return 'Hoje';
+    if (chave === CAA.chaveDia(ontem)) return 'Ontem';
+    return new Date(iso).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+  }
+
   function desenharHistorico() {
     const caixa = $('historico');
     caixa.replaceChildren();
 
     if (!frases.length) {
-      const vazio = estadoVazio('Nenhuma frase salva ainda. Monte uma frase na Casa e toque em Salvar.');
+      const vazio = estadoVazio('Nenhuma frase salva ainda.');
       const ir = CAA.el('a', 'botao verde', 'Ir para a Casa');
       ir.href = 'index.html';
       vazio.append(document.createElement('br'), ir);
@@ -179,16 +122,19 @@
       return;
     }
 
+    let diaAtual = '';
     frases.slice(0, limiteHistorico).forEach((frase) => {
+      const dia = nomeDoDia(frase.data_frase);
+      if (dia !== diaAtual) {
+        diaAtual = dia;
+        caixa.append(CAA.el('h3', 'dia-titulo', dia.charAt(0).toUpperCase() + dia.slice(1)));
+      }
+
       const registro = CAA.el('article', 'registro');
       const corpo = CAA.el('div');
-
       const topo = CAA.el('div', 'registro-topo');
-      topo.append(
-        CAA.el('span', 'etiqueta t-' + frase.tipo_frase, TIPOS[frase.tipo_frase] ? TIPOS[frase.tipo_frase].replace(/s$/, '') : frase.tipo_frase),
-        CAA.el('span', '', CAA.formatarData(frase.data_frase)),
-        CAA.el('span', '', '· ' + frase.qtd_palavras + (frase.qtd_palavras === 1 ? ' figura' : ' figuras')),
-      );
+      const hora = new Date(frase.data_frase).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      topo.append(CAA.el('span', 'etiqueta t-' + frase.tipo_frase, TIPOS[frase.tipo_frase] || frase.tipo_frase), CAA.el('span', '', hora));
 
       const figuras = CAA.el('div', 'registro-figuras');
       frase.palavras.forEach((p) => {
@@ -198,7 +144,6 @@
         imagem.loading = 'lazy';
         figuras.append(imagem);
       });
-
       const texto = frase.palavras.map((p) => p.txt_palavra).join(' ');
       corpo.append(topo, figuras, CAA.el('p', 'registro-frase', texto));
 
@@ -207,15 +152,14 @@
       ouvir.type = 'button';
       ouvir.append(CAA.icone('play-fill'), CAA.el('span', '', 'Ouvir'));
       ouvir.addEventListener('click', () => CAA.voz.falar(frase.palavras.map((p) => CAA.voz.textoParaFala(p.txt_palavra)).join(' ')));
-
       const apagar = CAA.el('button', 'botao-icone');
       apagar.type = 'button';
-      apagar.setAttribute('aria-label', 'Apagar a frase ' + texto);
       apagar.title = 'Apagar';
+      apagar.setAttribute('aria-label', 'Apagar a frase ' + texto);
       apagar.append(CAA.icone('trash3'));
       apagar.addEventListener('click', () => apagarFrase(frase, apagar));
-
       acoes.append(ouvir, apagar);
+
       registro.append(corpo, acoes);
       caixa.append(registro);
     });
@@ -223,8 +167,7 @@
     $('mais-historico').hidden = frases.length <= limiteHistorico;
   }
 
-  // Apaga a FRASE no banco. Por causa do "on delete cascade", as linhas
-  // de CRIA e CONTEM ligadas a ela somem junto.
+  // Apaga a FRASE no banco; por "on delete cascade", CRIA e CONTEM somem junto.
   async function apagarFrase(frase, botao) {
     if (!window.confirm('Apagar esta frase do histórico?')) return;
     botao.disabled = true;

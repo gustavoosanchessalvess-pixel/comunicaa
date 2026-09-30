@@ -5,7 +5,7 @@
 //   * o menu lateral (computador) e as abas de baixo (celular);
 //   * o cartão com o nome da pessoa logada e o botão Sair;
 //   * o cumprimento "Olá, Ana!";
-//   * o botão Modo Foco.
+//   * o MODO CRIANÇA (tela simples para a pessoa autista usar sozinha).
 //
 // Parábola: é o "molde de bolo". Cada página só coloca o recheio
 // (o conteúdo do <main>); a forma é sempre a mesma.
@@ -26,14 +26,14 @@
 
     const marca = CAA.el('a', 'marca');
     marca.href = 'index.html';
+    marca.setAttribute('aria-label', 'CAA: voltar para a Casa');
+    // Só o logo, bem grande (sem textos ao lado), como pediu o grupo.
     const logo = document.createElement('img');
     logo.src = 'assets/logo-caa.png';
-    logo.alt = '';
-    logo.width = 48;
-    logo.height = 48;
-    const nomeMarca = CAA.el('div');
-    nomeMarca.append(CAA.el('strong', '', 'CAA'), CAA.el('small', '', 'Comunicar é conectar'));
-    marca.append(logo, nomeMarca);
+    logo.alt = 'CAA';
+    logo.width = 168;
+    logo.height = 168;
+    marca.append(logo);
 
     const menu = CAA.el('nav', 'menu');
     menu.setAttribute('aria-label', 'Menu principal');
@@ -90,25 +90,29 @@
     const saudacao = document.getElementById('saudacao');
     if (saudacao) saudacao.textContent = 'Olá, ' + CAA.primeiroNome(usuario.nome_completo) + '!';
 
-    // ---------- MODO FOCO ----------
-    iniciarModoFoco();
   };
 
-  function iniciarModoFoco() {
-    const botao = document.getElementById('foco');
-    const aplicar = (ligado) => {
-      document.body.classList.toggle('foco', ligado);
-      if (botao) botao.setAttribute('aria-pressed', String(ligado));
-    };
-    aplicar(CAA.prefs.ler('foco', false));
-    if (!botao) return;
-    botao.addEventListener('click', () => {
-      const ligado = !document.body.classList.contains('foco');
-      aplicar(ligado);
-      CAA.prefs.salvar('foco', ligado);
-      CAA.toast(ligado ? 'Modo Foco ligado: figuras maiores.' : 'Modo Foco desligado.');
-    });
-  }
+  // -------------------------------------------------------------------
+  // MODO CRIANÇA
+  // Quem decide: o PERFIL da conta (tabela USUARIO).
+  //   * perfil "autista" ............ abre SEMPRE no Modo Criança;
+  //   * "responsavel"/"profissional"  abre no Modo Adulto e pode ligar o
+  //                                    Modo Criança para entregar o aparelho.
+  // A escolha fica guardada neste aparelho (localStorage).
+  // Parábola: é o "modo avião" do celular, só que para crianças: a
+  // tela fica simples e só um adulto (segurando o cadeado) desliga.
+  // -------------------------------------------------------------------
+  CAA.modoCrianca = {
+    ativo() {
+      const salvo = CAA.prefs.ler('modo-crianca', null);
+      if (salvo === null) return Boolean(CAA.usuario && CAA.usuario.perfil === 'autista');
+      return salvo === true;
+    },
+    ligar() { CAA.prefs.salvar('modo-crianca', true); window.location.href = 'index.html'; },
+    desligar() { CAA.prefs.salvar('modo-crianca', false); window.location.href = 'index.html'; },
+    // Nível de apoio escolhido pelo responsável: 3 = muito apoio (poucas figuras, enormes).
+    nivel() { return Number(CAA.prefs.ler('nivel-apoio', 2)) || 2; },
+  };
 
   function confirmarSaida() {
     if (window.confirm('Deseja sair da sua conta neste aparelho?')) CAA.auth.sair();
@@ -129,6 +133,11 @@
   CAA.iniciarPaginaInterna = async function (paginaAtual, iniciarConteudo) {
     try {
       const usuario = await CAA.auth.exigirUsuario();
+      // No Modo Criança só existe a Casa: Tabelas e Dicionário são dos adultos.
+      if (CAA.modoCrianca.ativo()) {
+        if (paginaAtual !== 'casa') { window.location.replace('index.html'); return; }
+        document.body.classList.add('crianca');
+      }
       CAA.montarEstrutura(paginaAtual, usuario);
       await iniciarConteudo(usuario);
     } catch (erro) {

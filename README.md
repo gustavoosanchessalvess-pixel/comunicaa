@@ -15,9 +15,10 @@ Plataforma web gratuita de **Comunicação Aumentativa e Alternativa (CAA)** com
 | Tela | Para que serve |
 |---|---|
 | **Entrar / Criar conta** | Login com **Google** (botão oficial do Google) ou com **e-mail e senha** (Supabase Auth). |
-| **Casa (prancha)** | Tocar nas figuras monta a frase; **Falar** lê em voz alta; **Salvar** guarda no banco. Tem atalhos "Preciso dizer" (Não, Me ajuda, Pausa, Ir no banheiro), busca, categorias e Modo Foco. |
+| **Casa (Modo Adulto)** | Tocar nas figuras monta a frase; **Falar** lê em voz alta; **Salvar** guarda no banco. Tem atalhos "Preciso dizer" (Não, Me ajuda, Pausa, Banheiro), busca e categorias. Figuras sempre grandes. |
+| **Casa (Modo Criança)** | Estilo Matraquinha: tela inteira, pastas grandes com figura, figuras em páginas (sem rolar), nível de apoio escolhido pelo adulto, "Falar" já salva no histórico e cadeado dos pais (segurar 2 s para sair). Abre sempre para o perfil "Pessoa autista". |
 | **Tabelas** | Todas as categorias do banco (assuntos e cores das palavras) e a tabela pessoal **"Minhas figuras"** (as figuras mais usadas pela própria pessoa). Tocar abre a prancha filtrada. |
-| **Dicionário** | Progresso: frases salvas, dias seguidos, média de figuras por frase, figuras diferentes, gráfico da semana, tipos de frase, figuras mais usadas e histórico com "Ouvir" e "Apagar". |
+| **Dicionário** | Para a família: resumo em uma frase, figuras que mais aparecem e histórico por dia com "Ouvir" e "Apagar" (sem gráficos ou notas, a pedido das profissionais). |
 
 ## Tecnologias
 
@@ -51,6 +52,7 @@ Os arquivos SQL estão em [`supabase/migrations`](supabase/migrations):
 1. `..._tabelas_do_der.sql`: cria as 7 tabelas.
 2. `..._seguranca_rls.sql`: regras de segurança (RLS) e as funções `salvar_frase` e `minhas_frases`.
 3. `..._catalogo_pecs.sql`: 64 categorias, 1.103 figuras e 2.230 ligações (gerado por `supabase/gerar-catalogo.mjs`).
+4. `..._ajuste_rotulos.sql`: "Ir no banheiro" passa a ser "Banheiro".
 
 ## Estrutura de pastas
 

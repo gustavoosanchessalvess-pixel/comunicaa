@@ -66,7 +66,7 @@ window.CAA = window.CAA || {};
 
   // -------------------------------------------------------------------
   // 3. PREFERÊNCIAS DO APARELHO (localStorage)
-  // Coisas de "gosto pessoal" deste aparelho (modo foco, voz escolhida)
+  // Coisas de "gosto pessoal" deste aparelho (Modo Criança, nível de apoio, voz escolhida)
   // ficam no próprio navegador. Dados importantes (frases) vão ao banco.
   // try/catch = "tenta; se der erro, não quebra a tela".
   // -------------------------------------------------------------------

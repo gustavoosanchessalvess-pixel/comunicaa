@@ -16,7 +16,7 @@
 (function () {
   const LIMITE_FIGURAS = 40;   // mesmo limite verificado no banco
   const POR_LOTE = 36;         // quantas figuras aparecem antes do "Mostrar mais"
-  const ATALHOS = ['Não', 'Me ajuda', 'Pausa', 'Ir no banheiro'];
+  const ATALHOS = ['Não', 'Me ajuda', 'Pausa', 'Banheiro'];
   const CHAVE_RASCUNHO = 'caa-mensagem-atual';
 
   let catalogo;                // tudo que veio do banco (catalogo.js)
@@ -43,12 +43,20 @@
     try { mensagem = (JSON.parse(sessionStorage.getItem(CHAVE_RASCUNHO)) || []).filter((id) => catalogo.palavras.has(id)); } catch (erro) { mensagem = []; }
 
     montarAtalhos();
-    montarChips();
-    montarLegenda();
     ligarBotoes();
     iniciarAjustesDeVoz();
-    desenharGrade();
     desenharFrase();
+
+    // "Porta" para o crianca.js usar as mesmas funções desta prancha.
+    CAA.prancha = { escolher, catalogo: () => catalogo, minhas: () => minhas };
+
+    if (document.body.classList.contains('crianca')) {
+      CAA.crianca.iniciar();   // tela simples: pastas + páginas (crianca.js)
+    } else {
+      montarChips();
+      montarLegenda();
+      desenharGrade();
+    }
   });
 
   // ------------------------------------------------------------------
@@ -133,7 +141,7 @@
       mudouMensagem();
     });
 
-    $('salvar').addEventListener('click', salvarFrase);
+    $('salvar').addEventListener('click', () => salvarFrase());
 
     // Busca: a cada letra digitada, a grade é redesenhada.
     $('busca').addEventListener('input', () => { limiteVisivel = POR_LOTE; desenharGrade(); });
@@ -160,6 +168,10 @@
         destacar(indice);
       },
     }).then(() => destacar(-1));
+
+    // No Modo Criança não existe botão "Salvar": falar a frase já guarda
+    // no histórico (para o responsável acompanhar no Dicionário).
+    if (document.body.classList.contains('crianca')) salvarFrase({ silencioso: true });
   }
 
   // ------------------------------------------------------------------
@@ -167,8 +179,11 @@
   // Chama a função salvar_frase do Supabase, que grava FRASE, CRIA e
   // CONTEM de uma vez só (ou nada, se der erro).
   // ------------------------------------------------------------------
-  async function salvarFrase() {
+  let ultimaSalva = '';          // evita salvar a mesma frase duas vezes seguidas
+  async function salvarFrase(opcoes) {
+    const silencioso = Boolean(opcoes && opcoes.silencioso);
     if (salvando || !mensagem.length) return;
+    if (silencioso && mensagem.join(',') === ultimaSalva) return;
     salvando = true;
     desenharFrase();
     try {
@@ -177,9 +192,12 @@
         p_palavras: mensagem,
       });
       if (error) throw error;
-      comemorar();
-      mensagem = [];
-      mudouMensagem();
+      ultimaSalva = mensagem.join(',');
+      if (!silencioso) {
+        comemorar();
+        mensagem = [];
+        mudouMensagem();
+      }
       // Atualiza "Minhas figuras" com a frase que acabou de ser salva.
       try {
         const tinha = minhas.length > 0;
@@ -210,7 +228,7 @@
   }
 
   // Estrelinha + confetes, como uma pequena conquista do Duolingo.
-  // No Modo Foco a comemoração é mais discreta (sem confetes).
+  // Comemoração curta; quem pede "menos movimento" no aparelho não vê animação (CSS).
   function comemorar() {
     const festa = CAA.el('div', 'festa');
     festa.setAttribute('role', 'status');
@@ -220,7 +238,7 @@
     cartao.append(estrela, CAA.el('strong', '', 'Frase salva!'), CAA.el('span', '', 'Muito bem! Ela já está no Dicionário.'));
     festa.append(cartao);
 
-    if (!document.body.classList.contains('foco')) {
+    {
       const cores = ['#37c26a', '#ffc43d', '#ff7bac', '#3fa9f5', '#a66bf0', '#ff9a3d'];
       for (let i = 0; i < 26; i++) {
         const confete = CAA.el('i', 'confete');
@@ -387,5 +405,17 @@
     });
 
     $('testar-voz').addEventListener('click', () => CAA.voz.falar('Oi! Eu sou a voz do CAA. Vamos conversar?'));
+
+    // Nível de apoio do Modo Criança (quantas figuras por página).
+    const nivel = String(CAA.modoCrianca.nivel());
+    document.querySelectorAll('#nivel-apoio button').forEach((botao) => {
+      botao.setAttribute('aria-pressed', String(botao.dataset.valor === nivel));
+      botao.addEventListener('click', () => {
+        CAA.prefs.salvar('nivel-apoio', Number(botao.dataset.valor));
+        document.querySelectorAll('#nivel-apoio button').forEach((b) => b.setAttribute('aria-pressed', String(b === botao)));
+      });
+    });
+    const ligarCrianca = $('ligar-crianca');
+    if (ligarCrianca) ligarCrianca.addEventListener('click', () => CAA.modoCrianca.ligar());
   }
 })();

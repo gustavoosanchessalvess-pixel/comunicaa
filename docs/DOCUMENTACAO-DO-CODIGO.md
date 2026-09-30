@@ -205,7 +205,7 @@ Todas ficam em `public/`. Cada uma carrega, nesta ordem, os scripts de que preci
 |---|---|---|---|
 | `login.html` | Entrar (Google, e-mail/senha, esqueci a senha) | Não | base, auth, login |
 | `cadastro.html` | Criar conta / completar cadastro | Não / Sim (completar) | base, auth, cadastro |
-| `index.html` | **Casa**: prancha de comunicação | Sim | base, auth, interface, voz, catalogo, prancha |
+| `index.html` | **Casa**: prancha de comunicação (Modo Adulto e Modo Criança) | Sim | base, auth, interface, voz, catalogo, prancha, crianca |
 | `tabelas.html` | Tabelas (categorias) | Sim | base, auth, interface, catalogo, tabelas |
 | `dicionario.html` | Dicionário (progresso e histórico) | Sim | base, auth, interface, voz, catalogo, dicionario |
 | `creditos.html` | Créditos (página pública) | Não | (nenhum) |
@@ -232,7 +232,7 @@ Todos ficam em `public/assets/js/`. Tudo do projeto é guardado dentro de um obj
 | `CAA.db` | Cria o **cliente do Supabase** (o "cartão do banco") com login PKCE, sessão guardada e renovação automática. |
 | `CAA.el(tag, classe, texto)` | Cria um elemento na tela de forma segura (usa `textContent`). |
 | `CAA.icone(nome)` | Cria um ícone do Bootstrap Icons. |
-| `CAA.prefs.ler/salvar` | Guarda preferências **deste aparelho** (Modo Foco, voz escolhida) no `localStorage`. |
+| `CAA.prefs.ler/salvar` | Guarda preferências **deste aparelho** (Modo Criança, nível de apoio, voz escolhida) no `localStorage`. |
 | `CAA.toast(msg)` | Mostra o aviso flutuante (como notificação de celular). |
 | `CAA.mensagemErro(erro)` | Traduz erros técnicos para português simples. |
 | `CAA.formatarData`, `CAA.chaveDia` | Datas no formato brasileiro. |
@@ -251,7 +251,7 @@ Todos ficam em `public/assets/js/`. Tudo do projeto é guardado dentro de um obj
 
 ### 7.4 `interface.js`: a moldura das telas internas
 - `CAA.montarEstrutura(pagina, usuario)`: monta o **menu lateral** (computador), as **abas de baixo** (celular), o cartão com **iniciais, nome e perfil**, o botão **Sair** e o cumprimento **"Olá, Nome!"**.
-- `iniciarModoFoco()`: liga/desliga o **Modo Foco** (figuras maiores, menos distrações) e lembra a escolha.
+- ``CAA.modoCrianca`: liga/desliga o **Modo Criança** (ver seção 7.11) e guarda o nível de apoio.
 - `CAA.iniciarPaginaInterna(pagina, funcao)`: o "roteiro" de toda página interna: 1) conferir login, 2) montar a moldura, 3) carregar o conteúdo da página, 4) esconder o carregando.
 
 **Parábola:** é o **molde de bolo**. Cada página só coloca o recheio; a forma é sempre a mesma.
@@ -281,7 +281,7 @@ Todos ficam em `public/assets/js/`. Tudo do projeto é guardado dentro de um obj
 | `falarFrase()` | Fala a frase inteira, "levantando" cada figura quando é dita. |
 | `salvarFrase()` | Chama `salvar_frase` no banco e comemora. |
 | `classificarFrase()` | Decide o **tipo_frase**: figura vermelha é **necessidade**; roxa ou "?" é **pergunta**; "quero/posso/preciso" é **pedido**; o resto é **expressão**. |
-| `comemorar()` | Estrelinha + confetes (sem confetes no Modo Foco). |
+| `comemorar()` | Estrelinha + confetes ao salvar (no Modo Adulto). |
 | `montarAtalhos()` | Botões "Preciso dizer": Não, Me ajuda, Pausa, Ir no banheiro. |
 | `montarChips()` | As pílulas de categoria (Mais usados, Comidas, ...). |
 | `desenharGrade()` | Mostra as figuras da categoria/busca, de 36 em 36 ("Mostrar mais"). |
@@ -289,16 +289,22 @@ Todos ficam em `public/assets/js/`. Tudo do projeto é guardado dentro de um obj
 
 A frase em construção fica guardada na aba (`sessionStorage`): se a pessoa for em Tabelas e voltar, a frase continua lá.
 
-### 7.8 `tabelas.js`: a estante
+### 7.8 `crianca.js`: o Modo Criança (estilo Matraquinha)
+- **Para quem:** a conta com perfil **"Pessoa autista"** abre sempre nele. Responsável e profissional abrem no **Modo Adulto** e tocam em **"Modo Criança"** para entregar o aparelho.
+- **Como é:** tela inteira, sem menu e sem busca. Aparecem **pastas grandes** (botões coloridos com texto branco e uma figura de capa). Tocando numa pasta, aparecem as figuras dela em **páginas** com setas "Antes" e "Mais": **a tela nunca rola**.
+- **Nível de apoio** (escolhido pelo adulto no botão ⚙️): *Muito* = poucas figuras enormes por página; *Médio*; *Pouco* = mais figuras. Fica guardado no aparelho.
+- **Falar já salva:** no Modo Criança não existe o botão "Salvar". Quando a criança toca em **Falar**, a frase vai sozinha para o histórico, para o adulto ver no Dicionário.
+- **Cadeado dos pais:** para sair é preciso **segurar o cadeado por 2 segundos** (um toque rápido não sai). Assim a criança não sai sem querer.
+- *Parábola:* é um livro de figuras com abas coloridas: escolhe a aba, vira a página, aponta. O adulto guarda o livro.
+
+### 7.8b `tabelas.js`: a estante
 Mostra cada **categoria** como um cartão (capa com 3 figuras + quantidade). Duas seções: **Assuntos** e **Cores das palavras**. Tocar abre `index.html?categoria=ID`, e a Casa já abre filtrada.
 
-### 7.9 `dicionario.js`: o boletim gentil
-Chama `minhas_frases()` e calcula, no próprio navegador:
-- **frases salvas**, **dias seguidos** (a "chama" do Duolingo), **média de figuras por frase** e **figuras diferentes** usadas;
-- **gráfico dos últimos 7 dias** (barras feitas só com CSS);
-- **tipos de frase** (pedido, pergunta, necessidade, expressão);
-- **meu dicionário**: as 18 figuras mais usadas;
-- **histórico**, com **Ouvir** e **Apagar** (apagar a FRASE apaga CRIA e CONTEM junto, pelo *cascade*).
+### 7.9 `dicionario.js`: o caderninho da família
+Chama `minhas_frases()` e mostra, em linguagem simples (**sem gráficos, notas ou comparações**, como pediram as profissionais que acompanham o projeto):
+- um **resumo em uma frase** ("Nos últimos 7 dias, foram feitas 5 frases. As figuras que mais aparecem são...");
+- **figuras que mais aparecem** (tocar numa figura faz ouvir);
+- **histórico separado por dia** (Hoje, Ontem...), com **Ouvir** e **Apagar** (apagar a FRASE apaga CRIA e CONTEM junto, pelo *cascade*).
 
 > Não é avaliação clínica: mostra o **uso**, para a família e os profissionais acompanharem a evolução.
 
@@ -324,8 +330,7 @@ Organizado em 10 partes numeradas no próprio arquivo:
 7. **Tabelas**: cartões com capa de 3 figuras.
 8. **Dicionário**: números grandes, gráfico de barras e histórico.
 9. **Login e cadastro**: fundo com manchas suaves de cor.
-10. **Modo Foco, movimento reduzido e celular**:
-    - **Modo Foco**: figuras maiores, sem legendas e rodapé.
+10. **Movimento reduzido e celular** (o antigo Modo Foco foi retirado: agora as figuras são SEMPRE grandes):
     - `prefers-reduced-motion`: se o aparelho pede "menos movimento", as animações são desligadas (importante para pessoas sensíveis a estímulos).
     - Até **960px**: o menu lateral vira **abas embaixo** (como apps de celular).
     - Até **640px**: tudo se reorganiza para caber no celular sem rolagem lateral.
@@ -404,7 +409,7 @@ Para a equipe entender e explicar cada linha, sem etapas de compilação. O site
 A intenção da mensagem: **pedido** ("quero"), **pergunta** (figuras roxas ou "?"), **necessidade** (figuras vermelhas: não, dor, ajuda) ou **expressão** (o resto). Ele aparece no Dicionário para acompanhar o que a pessoa mais comunica.
 
 **11. "E acessibilidade?"**
-Botões grandes, cores com contraste, texto sempre junto da figura (a cor nunca é a única pista), navegação por teclado, textos para leitores de tela, **Modo Foco** e respeito ao "reduzir movimento" do aparelho.
+Figuras sempre grandes, cores com contraste, texto sempre junto da figura (a cor nunca é a única pista), navegação por teclado, textos para leitores de tela, **Modo Criança sem rolagem** e respeito ao "reduzir movimento" do aparelho.
 
 **12. "E se a internet cair?"**
 A tela avisa "Sem conexão" em português. A frase em construção continua na tela.
@@ -415,7 +420,16 @@ Sim, a **"Minhas figuras"**, calculada a partir das frases que a pessoa salvou (
 **14. "Por que a tela do Google mostra o nome do site e não do Supabase?"**
 Usamos o botão oficial do Google (Google Identity Services). A janela abre a partir do `comunicaa.vercel.app`, o Google devolve um *id_token* assinado e o Supabase valida com `signInWithIdToken`. Se o botão oficial falhar, o login por redirecionamento continua como reserva.
 
-**15. "Onde o site está hospedado?"**
+**15. "Como o responsável acompanha a criança? E o profissional?"**
+O DER tem uma única entidade USUARIO, sem ligação entre contas. Então funciona assim: o **responsável cria a conta** e coloca o aparelho da criança no **Modo Criança**. Tudo o que a criança fala fica salvo **na mesma conta**, e o responsável vê no **Dicionário**. O **profissional** acompanha usando o aparelho/conta da família durante o atendimento, ou com o responsável mostrando o Dicionário. Ligar contas diferentes (ex.: um profissional com vários pacientes) precisaria de uma tabela nova no DER, o que ficou para uma versão futura.
+
+**16. "Por que o cartão é 'Banheiro' e não 'Ir no banheiro'?"**
+Em PECS/CAA os cartões costumam ser palavras curtas e concretas (de preferência um substantivo), e a frase se monta juntando cartões: "Eu" + "Quero" + "Banheiro". Um cartão com a ação inteira é mais difícil de reconhecer e de combinar. A figura continua a mesma; só o texto mudou (migração 4).
+
+**17. "Algumas figuras estavam cortadas. O que foi feito?"**
+Algumas figuras recortadas do PDF tinham pedaços de palavras cortadas, riscos da tabela do PDF e pontinhos soltos. Um script limpou 110 figuras (as originais estão guardadas em `backups/pcs-original`). "SOBRE" e "BASTANTE" têm a primeira/última letra encostada na borda e só poderiam ser refeitas com o PDF original.
+
+**18. "Onde o site está hospedado?"**
 Na **Vercel** (front-end) e no **Supabase**, região São Paulo (banco e login). O código está no **GitHub**.
 
 ---

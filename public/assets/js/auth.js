@@ -162,7 +162,10 @@
     // -----------------------------------------------------------------
     async prepararBotaoGoogle(caixa, botaoReserva, aoErro) {
       const idCliente = (window.CAA_CONFIG || {}).googleClientId;
-      if (!idCliente || !caixa || !CAA.db) return;
+      // O botão reserva começa ESCONDIDO (evita o "pisca" do logo do Google)
+      // e só aparece se o botão oficial não puder ser usado.
+      const mostrarReserva = () => { if (botaoReserva) botaoReserva.hidden = false; if (caixa) caixa.hidden = true; };
+      if (!idCliente || !caixa || !CAA.db) { mostrarReserva(); return; }
       try {
         await carregarScriptGoogle();
         const nonceBruto = crypto.randomUUID() + crypto.randomUUID();
@@ -191,6 +194,7 @@
         });
         if (botaoReserva) botaoReserva.hidden = true;
       } catch (erro) {
+        mostrarReserva();
         console.warn('Botão oficial do Google indisponível; usando o login por redirecionamento.', erro);
       }
     },
