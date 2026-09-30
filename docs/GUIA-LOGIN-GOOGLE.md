@@ -30,7 +30,13 @@ Dados do nosso projeto (vamos usar logo abaixo):
    - **Público / Audience:** **Externo (External)**
    - **E-mail de contato do desenvolvedor:** o e-mail do grupo
 4. Salve e continue até o fim (não precisa adicionar escopos: e-mail e perfil já vêm por padrão).
-5. Em **Público / Audience**, clique em **Publicar app / Publish app** e confirme.
+5. Em **Branding (Informações da marca)**, preencha os links do app (as páginas já existem no site):
+   - **Página inicial do app:** `https://comunicaa.vercel.app`
+   - **Política de privacidade:** `https://comunicaa.vercel.app/privacidade.html`
+   - **Termos de serviço:** `https://comunicaa.vercel.app/termos.html`
+   - **Domínios autorizados:** `comunicaa.vercel.app` (se pedir, adicione também `xpjiqtyumspnfkpqcrlh.supabase.co`)
+   - Logo: opcional (pode deixar sem, assim o Google não pede verificação da marca).
+6. Em **Público / Audience**, clique em **Publicar app / Publish app** e confirme.
    *Sem publicar, só os e-mails cadastrados como "usuários de teste" conseguem entrar.* Como usamos só e-mail e nome, o Google não exige verificação.
 
 ## 3. Criar a credencial (a "chave")
@@ -71,7 +77,7 @@ Pronto! Abra `https://comunicaa.vercel.app` e toque em **Continuar com Google**.
 |---|---|
 | `redirect_uri_mismatch` | A URL do passo 3.5 está diferente. Copie de novo do painel do Supabase (Google → Callback URL). |
 | "O login com Google ainda não foi ativado" | Faltou ligar o Google e salvar no passo 5. |
-| "Acesso bloqueado: app não verificado / só testadores" | Faltou **Publicar app** no passo 2.5. |
+| "Acesso bloqueado: app não verificado / só testadores" | Faltou **Publicar app** no passo 2.6. |
 | Volta para o login sem entrar | Veja se o endereço do site está em Supabase → Authentication → URL Configuration (já deixamos configurado: `https://comunicaa.vercel.app/**`). |
 
 ## Login com e-mail e senha (já funciona)
