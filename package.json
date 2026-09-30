@@ -1,0 +1,14 @@
+{
+  "name": "comunicaa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CAA - Comunicação Aumentativa e Alternativa com figuras PECS para pessoas autistas (TCC Etec 2026).",
+  "scripts": {
+    "config": "node scripts/gerar-config.mjs",
+    "catalogo": "node supabase/gerar-catalogo.mjs",
+    "dev": "node scripts/gerar-config.mjs && npx --yes serve public -l 5500",
+    "build": "node scripts/gerar-config.mjs"
+  },
+  "engines": { "node": ">=18" },
+  "license": "UNLICENSED"
+}

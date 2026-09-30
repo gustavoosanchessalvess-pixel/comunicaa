@@ -1,0 +1,93 @@
+<!doctype html>
+<!--
+  =====================================================================
+  CRIAR CONTA / COMPLETAR CADASTRO
+  * Conta nova com e-mail e senha (Supabase Auth) + dados da tabela USUARIO
+  * cadastro.html?completar=1 -> quem entrou com Google informa perfil e
+    data de nascimento (o e-mail e o nome já vêm do Google)
+  Comportamento: assets/js/cadastro.js
+  =====================================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f5f7">
+  <title>Criar conta · CAA</title>
+  <link rel="icon" href="assets/logo-caa.png">
+  <link rel="apple-touch-icon" href="assets/logo-caa.png">
+  <link rel="stylesheet" href="assets/vendor/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/estilo.css">
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/vendor/supabase.js" defer></script>
+  <script src="assets/js/base.js" defer></script>
+  <script src="assets/js/auth.js" defer></script>
+  <script src="assets/js/cadastro.js" defer></script>
+</head>
+<body>
+  <main id="conteudo" class="pagina-entrada">
+    <section class="entrada-cartao largo" aria-labelledby="titulo">
+      <img class="entrada-logo" src="assets/logo-caa.png" alt="" width="104" height="104">
+      <h1 id="titulo">Criar conta</h1>
+      <p id="subtitulo" class="subtitulo">Leva menos de um minuto.</p>
+
+      <p id="aviso" class="aviso" role="status" aria-live="polite"></p>
+
+      <div id="bloco-google">
+        <button id="entrar-google" class="botao-google" type="button">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+          Criar conta com Google
+        </button>
+        <div class="divisor">ou crie com e-mail</div>
+      </div>
+
+      <form id="form-cadastro" class="formulario" novalidate>
+        <div class="campo">
+          <label for="nome">Nome completo</label>
+          <input id="nome" class="entrada" type="text" autocomplete="name" maxlength="120" required placeholder="Ex.: Ana Clara Souza">
+        </div>
+
+        <div class="campo">
+          <span class="rotulo" id="rotulo-perfil">Quem vai usar esta conta?</span>
+          <div class="escolhas" role="radiogroup" aria-labelledby="rotulo-perfil">
+            <label class="escolha"><input type="radio" name="perfil" value="responsavel" required><span><i class="bi bi-people-fill" aria-hidden="true"></i>Responsável</span></label>
+            <label class="escolha"><input type="radio" name="perfil" value="profissional"><span><i class="bi bi-heart-pulse-fill" aria-hidden="true"></i>Profissional</span></label>
+            <label class="escolha"><input type="radio" name="perfil" value="autista"><span><i class="bi bi-emoji-smile-fill" aria-hidden="true"></i>Pessoa autista</span></label>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="nascimento">Data de nascimento <span class="texto-2">(opcional)</span></label>
+          <input id="nascimento" class="entrada" type="date" min="1900-01-01">
+        </div>
+
+        <!-- E-mail e senha só aparecem na conta nova (quem veio do Google já tem). -->
+        <div id="bloco-credenciais" class="formulario">
+          <div class="campo">
+            <label for="email">E-mail</label>
+            <input id="email" class="entrada" type="email" autocomplete="email" inputmode="email" required placeholder="seu@email.com">
+          </div>
+          <div class="duas-colunas">
+            <div class="campo">
+              <label for="senha">Senha</label>
+              <input id="senha" class="entrada" type="password" autocomplete="new-password" minlength="8" required placeholder="8+ caracteres">
+            </div>
+            <div class="campo">
+              <label for="senha-2">Repita a senha</label>
+              <input id="senha-2" class="entrada" type="password" autocomplete="new-password" minlength="8" required>
+            </div>
+          </div>
+        </div>
+
+        <p id="email-google" class="aviso info" hidden></p>
+
+        <p class="texto-2 pequeno">Usamos estes dados só para o funcionamento do CAA. Para crianças, a conta deve ser criada pelo responsável.</p>
+
+        <button id="botao-cadastrar" class="botao verde largo" type="submit"><i class="bi bi-person-plus-fill" aria-hidden="true"></i> <span id="texto-botao">Criar minha conta</span></button>
+      </form>
+
+      <p id="rodape-entrar" class="entrada-rodape">Já tem conta? <a href="login.html">Entrar</a></p>
+    </section>
+  </main>
+</body>
+</html>

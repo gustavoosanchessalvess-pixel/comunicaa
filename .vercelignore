@@ -1,0 +1,10 @@
+# Arquivos que NÃO sobem para a Vercel (segredos e coisas que o site não usa)
+.env
+.env.*
+public/assets/js/config.js
+supabase/.temp
+supabase/.branches
+supabase/config.toml
+node_modules
+docs
+*.md

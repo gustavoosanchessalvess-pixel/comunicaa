@@ -1,0 +1,23 @@
+# ===================================================================
+# .gitignore = lista de coisas que NUNCA vão para o GitHub.
+# ===================================================================
+
+# Segredos e configuração local (endereço e chaves do Supabase)
+.env
+.env.*
+!.env.example
+public/assets/js/config.js
+
+# Pastas geradas por ferramentas
+node_modules/
+.vercel/
+supabase/.temp/
+supabase/.branches/
+
+# Arquivos do sistema e de editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.log

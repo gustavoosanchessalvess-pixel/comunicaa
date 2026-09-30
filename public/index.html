@@ -1,0 +1,127 @@
+<!doctype html>
+<!--
+  =====================================================================
+  CASA · PRANCHA DE COMUNICAÇÃO
+  O HTML é o "esqueleto" da tela: diz O QUE existe (faixa da frase,
+  botões, grade de figuras). A aparência vem de estilo.css e o
+  comportamento vem de prancha.js.
+  O menu lateral e as abas do celular são montados por interface.js.
+  =====================================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="CAA: Comunicação Aumentativa e Alternativa com figuras PECS para pessoas autistas.">
+  <meta name="theme-color" content="#f5f5f7">
+  <title>Casa · CAA</title>
+  <link rel="icon" href="assets/logo-caa.png">
+  <link rel="apple-touch-icon" href="assets/logo-caa.png">
+  <link rel="stylesheet" href="assets/vendor/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/estilo.css">
+  <!-- "defer" = baixa agora, mas só executa depois que a página inteira foi lida, na ordem abaixo. -->
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/vendor/supabase.js" defer></script>
+  <script src="assets/js/base.js" defer></script>
+  <script src="assets/js/auth.js" defer></script>
+  <script src="assets/js/interface.js" defer></script>
+  <script src="assets/js/voz.js" defer></script>
+  <script src="assets/js/catalogo.js" defer></script>
+  <script src="assets/js/prancha.js" defer></script>
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- Três bolinhas enquanto conferimos o login e carregamos as figuras. -->
+  <div id="carregando" class="carregando-tela" aria-label="Carregando"><div class="bolinhas"><i></i><i></i><i></i></div></div>
+
+  <div class="principal">
+    <header class="topo">
+      <div>
+        <p class="saudacao" id="saudacao">Olá!</p>
+        <p class="subtitulo">Vamos montar uma frase?</p>
+      </div>
+      <div class="topo-acoes">
+        <button id="abrir-ajustes" class="botao-icone" type="button" title="Ajustes de voz" aria-label="Ajustes de voz">
+          <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+        </button>
+        <button id="foco" class="botao-foco" type="button" aria-pressed="false">
+          <i class="bi bi-stars" aria-hidden="true"></i><span>Modo Foco</span><span class="interruptor" aria-hidden="true"></span>
+        </button>
+      </div>
+    </header>
+
+    <main id="conteudo">
+      <!-- FAIXA DA FRASE (fica grudada no topo ao rolar) -->
+      <section class="frase-painel" aria-labelledby="titulo-frase">
+        <h1 id="titulo-frase" class="so-leitor">Minha frase</h1>
+        <div id="frase-faixa" class="frase-faixa" aria-label="Figuras da frase"></div>
+        <div class="frase-acoes">
+          <button id="falar" class="botao verde falar" type="button" disabled><i class="bi bi-play-fill" aria-hidden="true"></i><span>Falar</span></button>
+          <button id="apagar" class="botao laranja" type="button" disabled aria-label="Apagar a última figura"><i class="bi bi-backspace-fill" aria-hidden="true"></i><span>Apagar</span></button>
+          <button id="limpar" class="botao vermelho" type="button" disabled aria-label="Limpar a frase inteira"><i class="bi bi-trash3-fill" aria-hidden="true"></i><span>Limpar</span></button>
+          <button id="salvar" class="botao azul salvar" type="button" disabled><i class="bi bi-check-lg" aria-hidden="true"></i><span>Salvar</span></button>
+        </div>
+        <p id="frase-texto" class="frase-texto" aria-live="polite"></p>
+      </section>
+
+      <!-- ATALHOS SEMPRE À MÃO -->
+      <div class="atalhos" aria-label="Preciso dizer">
+        <span class="atalhos-titulo">Preciso dizer:</span>
+        <div id="atalhos-lista" class="atalhos-lista"></div>
+      </div>
+
+      <!-- BUSCA E CATEGORIAS -->
+      <section class="ferramentas" aria-label="Encontrar figuras">
+        <label class="busca" for="busca">
+          <span class="so-leitor">Buscar uma figura</span>
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input id="busca" class="entrada" type="search" placeholder="Buscar uma figura (ex.: água)" autocomplete="off" enterkeyhint="search">
+        </label>
+        <div id="chips" class="chips" role="group" aria-label="Categorias"></div>
+      </section>
+
+      <!-- GRADE DE FIGURAS PECS -->
+      <section aria-label="Figuras de comunicação">
+        <p id="contador" class="texto-2 pequeno" aria-live="polite"></p>
+        <div id="grade" class="grade"></div>
+        <div class="mais"><button id="mostrar-mais" class="botao neutro" type="button" hidden>Mostrar mais figuras</button></div>
+      </section>
+
+      <details class="legenda">
+        <summary>O que significam as cores das bordas?</summary>
+        <div id="legenda-lista" class="legenda-lista"></div>
+      </details>
+    </main>
+
+    <footer class="rodape">Comunicar é conectar. <i class="bi bi-heart-fill" aria-hidden="true"></i> · <a href="creditos.html">Créditos</a></footer>
+  </div>
+
+  <!-- JANELA DE AJUSTES DE VOZ (<dialog> é uma janelinha nativa do navegador) -->
+  <dialog id="ajustes-voz" class="folha" aria-labelledby="titulo-ajustes">
+    <div class="folha-conteudo">
+      <div class="folha-topo">
+        <h2 id="titulo-ajustes">Ajustes de voz</h2>
+        <button id="fechar-ajustes" class="botao-icone" type="button" aria-label="Fechar"><i class="bi bi-x-lg" aria-hidden="true"></i></button>
+      </div>
+      <div class="campo">
+        <label for="voz-escolha">Voz</label>
+        <select id="voz-escolha" class="entrada"></select>
+        <span id="voz-aviso" class="ajuda">A opção automática escolhe a voz mais natural do seu aparelho.</span>
+      </div>
+      <div class="campo">
+        <span class="rotulo" id="rotulo-velocidade">Velocidade</span>
+        <div id="voz-velocidade" class="segmentos" role="group" aria-labelledby="rotulo-velocidade">
+          <button type="button" data-valor="devagar" aria-pressed="false">Devagar</button>
+          <button type="button" data-valor="normal" aria-pressed="true">Normal</button>
+          <button type="button" data-valor="rapido" aria-pressed="false">Rápido</button>
+        </div>
+      </div>
+      <button id="voz-ao-tocar" class="linha-ajuste" type="button" aria-pressed="true">
+        <span>Falar ao tocar na figura</span><span class="interruptor" aria-hidden="true"></span>
+      </button>
+      <button id="testar-voz" class="botao verde largo" type="button"><i class="bi bi-play-fill" aria-hidden="true"></i> Testar voz</button>
+    </div>
+  </dialog>
+</body>
+</html>

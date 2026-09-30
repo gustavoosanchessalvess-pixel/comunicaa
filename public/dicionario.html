@@ -1,0 +1,92 @@
+<!doctype html>
+<!--
+  =====================================================================
+  DICIONÁRIO · progresso e histórico das frases da pessoa logada
+  Dados: função minhas_frases (FRASE + CRIA + CONTEM + PALAVRAS_PECS)
+  Comportamento: assets/js/dicionario.js
+  =====================================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f5f7">
+  <title>Dicionário · CAA</title>
+  <link rel="icon" href="assets/logo-caa.png">
+  <link rel="apple-touch-icon" href="assets/logo-caa.png">
+  <link rel="stylesheet" href="assets/vendor/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/estilo.css">
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/vendor/supabase.js" defer></script>
+  <script src="assets/js/base.js" defer></script>
+  <script src="assets/js/auth.js" defer></script>
+  <script src="assets/js/interface.js" defer></script>
+  <script src="assets/js/voz.js" defer></script>
+  <script src="assets/js/catalogo.js" defer></script>
+  <script src="assets/js/dicionario.js" defer></script>
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <div id="carregando" class="carregando-tela" aria-label="Carregando"><div class="bolinhas"><i></i><i></i><i></i></div></div>
+
+  <div class="principal">
+    <header class="topo">
+      <div>
+        <h1 class="saudacao">Dicionário</h1>
+        <p class="subtitulo">Cada comunicação tem seu valor.</p>
+      </div>
+      <div class="topo-acoes">
+        <button id="foco" class="botao-foco" type="button" aria-pressed="false">
+          <i class="bi bi-stars" aria-hidden="true"></i><span>Modo Foco</span><span class="interruptor" aria-hidden="true"></span>
+        </button>
+      </div>
+    </header>
+
+    <main id="conteudo">
+      <!-- NÚMEROS DO PROGRESSO -->
+      <section class="numeros" aria-label="Resumo do progresso">
+        <div class="numero frases"><i class="bi bi-chat-square-heart-fill" aria-hidden="true"></i><strong id="n-frases">0</strong><span>frases salvas</span></div>
+        <div class="numero fogo"><i class="bi bi-fire" aria-hidden="true"></i><strong id="n-sequencia">0</strong><span>dias seguidos</span></div>
+        <div class="numero media"><i class="bi bi-bar-chart-fill" aria-hidden="true"></i><strong id="n-media">0</strong><span>figuras por frase</span></div>
+        <div class="numero vocab"><i class="bi bi-book-half" aria-hidden="true"></i><strong id="n-vocabulario">0</strong><span>figuras diferentes</span></div>
+      </section>
+
+      <div class="colunas">
+        <section class="painel" aria-labelledby="titulo-semana">
+          <h2 id="titulo-semana">Últimos 7 dias</h2>
+          <p class="texto-2 pequeno">Quantas frases foram salvas em cada dia.</p>
+          <div id="semana" class="semana"></div>
+        </section>
+        <section class="painel" aria-labelledby="titulo-tipos">
+          <h2 id="titulo-tipos">Tipos de frase</h2>
+          <p class="texto-2 pequeno">O que a pessoa mais comunicou.</p>
+          <div id="tipos" class="tipos"></div>
+        </section>
+      </div>
+
+      <section class="painel" aria-labelledby="titulo-vocabulario">
+        <div class="painel-cabecalho">
+          <div>
+            <h2 id="titulo-vocabulario">Meu dicionário</h2>
+            <p class="texto-2 pequeno">As figuras mais usadas nas frases.</p>
+          </div>
+        </div>
+        <div id="vocabulario" class="vocabulario"></div>
+      </section>
+
+      <section class="painel" aria-labelledby="titulo-historico">
+        <div class="painel-cabecalho">
+          <div>
+            <h2 id="titulo-historico">Histórico de frases</h2>
+            <p class="texto-2 pequeno">Registro de uso. Não é uma avaliação clínica.</p>
+          </div>
+        </div>
+        <div id="historico" class="historico"></div>
+        <div class="mais"><button id="mais-historico" class="botao neutro" type="button" hidden>Ver frases mais antigas</button></div>
+      </section>
+    </main>
+
+    <footer class="rodape">Comunicar é conectar. <i class="bi bi-heart-fill" aria-hidden="true"></i> · <a href="creditos.html">Créditos</a></footer>
+  </div>
+</body>
+</html>
