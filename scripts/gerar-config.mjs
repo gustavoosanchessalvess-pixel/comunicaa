@@ -32,6 +32,9 @@ if (existsSync(arquivoEnv)) {
 // trim() tira espaços e quebras de linha que às vezes vêm grudados no valor.
 const url = (process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '');
 const chave = (process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || '').trim();
+// ID do cliente Google (público: aparece em qualquer tela de login do Google).
+// Serve para o botão oficial "Continuar com Google" abrir direto do nosso site.
+const googleClientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
 
 if (!url || !chave) {
   console.error('ERRO: defina SUPABASE_URL e SUPABASE_KEY (arquivo .env ou variáveis da Vercel).');
@@ -51,6 +54,7 @@ const conteudo = `// Gerado automaticamente por scripts/gerar-config.mjs. Não e
 window.CAA_CONFIG = {
   supabaseUrl: ${JSON.stringify(url)},
   supabaseKey: ${JSON.stringify(chave)},
+  googleClientId: ${JSON.stringify(googleClientId)},
 };
 `;
 writeFileSync(join(raiz, 'public', 'assets', 'js', 'config.js'), conteudo, 'utf8');

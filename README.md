@@ -14,9 +14,9 @@ Plataforma web gratuita de **Comunicação Aumentativa e Alternativa (CAA)** com
 
 | Tela | Para que serve |
 |---|---|
-| **Entrar / Criar conta** | Login com **Google** ou com **e-mail e senha** (Supabase Auth). |
+| **Entrar / Criar conta** | Login com **Google** (botão oficial do Google) ou com **e-mail e senha** (Supabase Auth). |
 | **Casa (prancha)** | Tocar nas figuras monta a frase; **Falar** lê em voz alta; **Salvar** guarda no banco. Tem atalhos "Preciso dizer" (Não, Me ajuda, Pausa, Ir no banheiro), busca, categorias e Modo Foco. |
-| **Tabelas** | Todas as categorias do banco (assuntos e cores das palavras). Tocar abre a prancha filtrada. |
+| **Tabelas** | Todas as categorias do banco (assuntos e cores das palavras) e a tabela pessoal **"Minhas figuras"** (as figuras mais usadas pela própria pessoa). Tocar abre a prancha filtrada. |
 | **Dicionário** | Progresso: frases salvas, dias seguidos, média de figuras por frase, figuras diferentes, gráfico da semana, tipos de frase, figuras mais usadas e histórico com "Ouvir" e "Apagar". |
 
 ## Tecnologias

@@ -158,6 +158,28 @@
       return botao;
     },
 
+    // -----------------------------------------------------------------
+    // "MINHAS FIGURAS": a tabela pessoal de cada usuário.
+    // Não existe coluna de "dono" na CATEGORIA (o DER não tem), então a
+    // tabela pessoal é CALCULADA a partir das frases que a própria pessoa
+    // salvou (CRIA + CONTEM), pela função minhas_frases (que só devolve
+    // as frases dela, por causa do RLS). As mais usadas vêm primeiro.
+    //
+    // Parábola: é a "gaveta de brinquedos favoritos": ninguém precisa
+    // arrumar; ela se enche sozinha com o que a criança mais usa.
+    // -----------------------------------------------------------------
+    async minhasFiguras(catalogo, limite = 36) {
+      const { data, error } = await CAA.db.rpc('minhas_frases', { p_limite: 500 });
+      if (error) throw error;
+      const usos = new Map();
+      (data || []).forEach((frase) => frase.palavras.forEach((p) => usos.set(p.id_palavra, (usos.get(p.id_palavra) || 0) + 1)));
+      return [...usos.entries()]
+        .filter(([id]) => catalogo.palavras.has(id))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, limite)
+        .map(([id]) => id);
+    },
+
     limparCache() { try { sessionStorage.removeItem(CHAVE_CACHE); } catch (erro) { /* ignorado */ } },
   };
 })();

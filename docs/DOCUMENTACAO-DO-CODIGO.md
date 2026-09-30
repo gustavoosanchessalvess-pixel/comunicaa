@@ -245,7 +245,8 @@ Todos ficam em `public/assets/js/`. Tudo do projeto é guardado dentro de um obj
 | `CAA.auth.sessao()` | Pergunta ao Supabase se tem alguém logado. |
 | `CAA.auth.exigirUsuario()` | **Porteiro das páginas internas**: sem login, vai para `login.html`; com login mas sem linha em `usuario`, vai completar o cadastro (ou cria sozinho com os dados informados no cadastro por e-mail). |
 | `CAA.auth.criarUsuario(dados, sessao)` | Grava a linha na tabela **USUARIO**. O e-mail vem **do crachá**, nunca de um campo digitado. |
-| `CAA.auth.entrarComGoogle()` | Abre a escolha de conta do Google e volta para `index.html`. |
+| `CAA.auth.prepararBotaoGoogle()` | Desenha o **botão oficial do Google** (Google Identity Services). A janelinha do Google abre a partir do nosso site e mostra **comunicaa.vercel.app** e o nome do app, em vez do endereço técnico do Supabase. O Google devolve uma prova de identidade (*id_token*) e `signInWithIdToken` entrega ao Supabase, que cria a sessão. Usa um *nonce* (número de uso único) contra reaproveitamento. |
+| `CAA.auth.entrarComGoogle()` | **Reserva**: login por redirecionamento, usado só se o botão oficial não carregar. |
 | `CAA.auth.sair()` | Devolve o crachá (logout) e limpa os dados da aba. |
 
 ### 7.4 `interface.js`: a moldura das telas internas
@@ -268,6 +269,7 @@ Todos ficam em `public/assets/js/`. Tudo do projeto é guardado dentro de um obj
 - **`carregar()`**: busca **CATEGORIA**, **PALAVRAS_PECS** e **TEM** ao mesmo tempo e organiza: cada figura ganha sua **cor** (pela categoria "Classe: ..."), e cada categoria ganha sua lista de figuras **na ordem** (`tem.data_criacao`). Guarda uma cópia na aba (`sessionStorage`) para as outras telas abrirem instantaneamente.
 - **`criarCartao(palavra)`**: cria o botão da figura (imagem + texto + borda colorida) com a animação de toque.
 - **`CLASSES`**: a lista das categorias de cor (chave de Fitzgerald) e a classe CSS de cada uma.
+- **`minhasFiguras()`**: monta a tabela pessoal **"💜 Minhas figuras"**: as figuras que a própria pessoa mais usou nas frases salvas (CRIA + CONTEM, via `minhas_frases`). Como o DER não tem coluna de "dono" em CATEGORIA, a tabela pessoal é **calculada**, não gravada. Aparece na Casa e em Tabelas assim que a pessoa salva a primeira frase. *Parábola:* a gaveta de brinquedos favoritos que se enche sozinha.
 
 **Parábola:** **PALAVRAS_PECS** são as figurinhas, **CATEGORIA** são as páginas do álbum e **TEM** diz em qual página cada figurinha é colada, e em qual posição.
 
@@ -407,7 +409,13 @@ Botões grandes, cores com contraste, texto sempre junto da figura (a cor nunca 
 **12. "E se a internet cair?"**
 A tela avisa "Sem conexão" em português. A frase em construção continua na tela.
 
-**13. "Onde o site está hospedado?"**
+**13. "Cada usuário pode ter a sua própria tabela?"**
+Sim, a **"Minhas figuras"**, calculada a partir das frases que a pessoa salvou (as mais usadas primeiro). Não foi preciso criar coluna nova no DER: os dados já estão em CRIA e CONTEM.
+
+**14. "Por que a tela do Google mostra o nome do site e não do Supabase?"**
+Usamos o botão oficial do Google (Google Identity Services). A janela abre a partir do `comunicaa.vercel.app`, o Google devolve um *id_token* assinado e o Supabase valida com `signInWithIdToken`. Se o botão oficial falhar, o login por redirecionamento continua como reserva.
+
+**15. "Onde o site está hospedado?"**
 Na **Vercel** (front-end) e no **Supabase**, região São Paulo (banco e login). O código está no **GitHub**.
 
 ---

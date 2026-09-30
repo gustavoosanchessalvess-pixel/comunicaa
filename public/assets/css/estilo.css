@@ -195,6 +195,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .botao-google:active { transform: translateY(4px); box-shadow: 0 0 0 2px var(--linha) inset; }
 .botao-google svg { width: 22px; height: 22px; flex-shrink: 0; }
+/* Caixa do botão oficial do Google (o próprio Google desenha o botão dentro). */
+.google-oficial { display: flex; justify-content: center; }
+.google-oficial:empty { display: none; }
+.google-oficial iframe { max-width: 100%; }
 
 /* Interruptor (liga/desliga) no estilo iPhone. */
 .interruptor {

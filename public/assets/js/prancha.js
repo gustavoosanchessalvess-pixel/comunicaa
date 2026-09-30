@@ -22,7 +22,8 @@
   let catalogo;                // tudo que veio do banco (catalogo.js)
   let mensagem = [];           // ids das figuras, na ordem em que foram tocadas
   let salvando = false;        // evita salvar duas vezes com toque duplo
-  let filtro = null;           // categoria escolhida (id) ou 'todas'
+  let filtro = null;           // categoria escolhida (id), 'minhas' ou 'todas'
+  let minhas = [];             // "Minhas figuras": as mais usadas pela pessoa (catalogo.js)
   let limiteVisivel = POR_LOTE;
 
   // Atalhos para os elementos da página (document.getElementById = "ache pelo id").
@@ -30,10 +31,13 @@
 
   CAA.iniciarPaginaInterna('casa', async () => {
     catalogo = await CAA.catalogo.carregar();
+    try { minhas = await CAA.catalogo.minhasFiguras(catalogo); } catch (erro) { minhas = []; }
 
     // Se veio da tela Tabelas (index.html?categoria=12), abre aquela categoria.
-    const pedida = Number(new URLSearchParams(window.location.search).get('categoria'));
-    filtro = catalogo.categorias.has(pedida) ? pedida : (catalogo.maisUsados ? catalogo.maisUsados.id : 'todas');
+    const parametro = new URLSearchParams(window.location.search).get('categoria');
+    const pedida = Number(parametro);
+    if (parametro === 'minhas' && minhas.length) filtro = 'minhas';
+    else filtro = catalogo.categorias.has(pedida) ? pedida : (catalogo.maisUsados ? catalogo.maisUsados.id : 'todas');
 
     // Recupera a mensagem que estava sendo montada (se a pessoa trocou de tela).
     try { mensagem = (JSON.parse(sessionStorage.getItem(CHAVE_RASCUNHO)) || []).filter((id) => catalogo.palavras.has(id)); } catch (erro) { mensagem = []; }
@@ -176,6 +180,13 @@
       comemorar();
       mensagem = [];
       mudouMensagem();
+      // Atualiza "Minhas figuras" com a frase que acabou de ser salva.
+      try {
+        const tinha = minhas.length > 0;
+        minhas = await CAA.catalogo.minhasFiguras(catalogo);
+        if (!tinha && minhas.length) montarChips();
+        if (filtro === 'minhas') desenharGrade();
+      } catch (erro) { /* não atrapalha o salvamento */ }
     } catch (erro) {
       console.error(erro);
       CAA.toast(CAA.mensagemErro(erro), 'erro');
@@ -252,8 +263,10 @@
   // ------------------------------------------------------------------
   function montarChips() {
     const caixa = $('chips');
+    caixa.replaceChildren();
     const opcoes = [];
     if (catalogo.maisUsados) opcoes.push({ id: catalogo.maisUsados.id, nome: '⭐ Mais usados' });
+    if (minhas.length) opcoes.push({ id: 'minhas', nome: '💜 Minhas figuras' });
     // Se veio de uma "cor" (classe) pela tela Tabelas, ela aparece como pílula também.
     const pedida = catalogo.categorias.get(filtro);
     if (pedida && pedida.tipo === 'classe') opcoes.push({ id: pedida.id, nome: pedida.nome });
@@ -288,6 +301,7 @@
     // Com busca digitada, procura no catálogo INTEIRO.
     if (termo) return catalogo.todas.filter((id) => catalogo.palavras.get(id).busca.includes(termo));
     if (filtro === 'todas') return catalogo.todas;
+    if (filtro === 'minhas') return minhas;
     const categoria = catalogo.categorias.get(filtro);
     return categoria ? categoria.palavras : [];
   }

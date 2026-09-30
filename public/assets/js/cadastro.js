@@ -159,4 +159,11 @@
   });
 
   iniciar().catch((erro) => avisar(CAA.mensagemErro(erro), 'erro'));
+
+  // Botão oficial do Google (mostra "comunicaa.vercel.app" em vez do endereço do Supabase).
+  CAA.auth.prepararBotaoGoogle(
+    document.getElementById('google-oficial'),
+    document.getElementById('entrar-google'),
+    (erro) => avisar(CAA.mensagemErro(erro), 'erro'),
+  );
 })();

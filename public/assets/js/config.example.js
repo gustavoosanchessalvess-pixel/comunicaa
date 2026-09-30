@@ -16,4 +16,6 @@
 window.CAA_CONFIG = {
   supabaseUrl: 'https://SEU-PROJETO.supabase.co',
   supabaseKey: 'sua-chave-publica-aqui',
+  // Opcional: ID do cliente OAuth do Google (termina com .apps.googleusercontent.com)
+  googleClientId: '',
 };

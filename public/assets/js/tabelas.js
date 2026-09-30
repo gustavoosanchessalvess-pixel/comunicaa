@@ -24,9 +24,11 @@
   const CORES_ASSUNTO = ['var(--verde)', 'var(--azul)', 'var(--laranja)', 'var(--roxo)', 'var(--vermelho)'];
 
   let catalogo;
+  let minhas = []; // "Minhas figuras" (tabela pessoal calculada das frases salvas)
 
   CAA.iniciarPaginaInterna('tabelas', async () => {
     catalogo = await CAA.catalogo.carregar();
+    try { minhas = await CAA.catalogo.minhasFiguras(catalogo); } catch (erro) { minhas = []; }
     document.getElementById('busca-tabela').addEventListener('input', desenhar);
     desenhar();
   });
@@ -35,7 +37,11 @@
     const termo = CAA.normalizar(document.getElementById('busca-tabela').value.trim());
     const combina = (categoria) => !termo || CAA.normalizar(categoria.nome).includes(termo);
 
-    const assuntos = [catalogo.maisUsados, ...catalogo.assuntos].filter(Boolean).filter(combina);
+    // Tabela pessoal: aparece quando a pessoa já salvou alguma frase.
+    const pessoal = minhas.length
+      ? { id: 'minhas', nome: 'Minhas figuras', tipo: 'pessoal', palavras: minhas }
+      : null;
+    const assuntos = [catalogo.maisUsados, pessoal, ...catalogo.assuntos].filter(Boolean).filter(combina);
     const classes = catalogo.classes.filter(combina);
 
     preencher('lista-assuntos', assuntos, (categoria, indice) => CORES_ASSUNTO[indice % CORES_ASSUNTO.length]);
@@ -67,7 +73,8 @@
 
       const total = categoria.palavras.length;
       const selo = CAA.el('span', 'selo', total + (total === 1 ? ' figura' : ' figuras'));
-      link.append(capa, CAA.el('strong', '', categoria.tipo === 'inicio' ? '⭐ ' + categoria.nome : categoria.nome), selo);
+      const icone = categoria.tipo === 'inicio' ? '⭐ ' : categoria.tipo === 'pessoal' ? '💜 ' : '';
+      link.append(capa, CAA.el('strong', '', icone + categoria.nome), selo);
       lista.append(link);
     });
   }

@@ -25,7 +25,7 @@ Dados do nosso projeto (vamos usar logo abaixo):
 1. Menu ☰, depois **APIs e serviços**, depois **Tela de consentimento OAuth** (em inglês: *Google Auth Platform → Branding*).
 2. Se pedir, clique em **Começar / Get started**.
 3. Preencha:
-   - **Nome do app:** `CAA - Comunicação Alternativa`
+   - **Nome do app:** `CAA - Comunicação Aumentativa e Alternativa` (é o nome que aparece na janela do Google)
    - **E-mail de suporte:** o e-mail do grupo
    - **Público / Audience:** **Externo (External)**
    - **E-mail de contato do desenvolvedor:** o e-mail do grupo
@@ -84,3 +84,9 @@ Pronto! Abra `https://comunicaa.vercel.app` e toque em **Continuar com Google**.
 
 - Ao criar conta com e-mail, o Supabase manda um **link de confirmação**. Só depois de clicar no link a pessoa consegue entrar (proteção contra alguém usar o e-mail de outra pessoa).
 - O servidor de e-mail gratuito do Supabase envia **poucos e-mails por hora** (limite do plano grátis). Para a apresentação, prefira o **login com Google**. Se precisarem de muitos cadastros por e-mail, dá para ligar um SMTP próprio (Gmail, Brevo, Resend) em *Authentication → Emails → SMTP Settings*.
+
+## Por que a janela do Google mostra "comunicaa.vercel.app" (e não o endereço do Supabase)
+
+O site usa o **botão oficial do Google** (Google Identity Services). A janelinha abre a partir do nosso site, então o Google mostra `comunicaa.vercel.app` e o **nome do app** do passo 2. Para isso funcionar, as **Origens JavaScript autorizadas** do passo 3.4 precisam ter `https://comunicaa.vercel.app` (e `http://localhost:5500` para testes). O ID do cliente (público) fica na variável `GOOGLE_CLIENT_ID` (arquivo `.env` e Vercel).
+
+Se o botão oficial não carregar (bloqueador, internet ruim), aparece o botão antigo, que usa redirecionamento pelo Supabase. Ele também funciona, só que mostra o endereço técnico do Supabase.

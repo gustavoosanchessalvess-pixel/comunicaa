@@ -141,6 +141,60 @@
       if (error) throw error;
     },
 
+    // -----------------------------------------------------------------
+    // BOTÃO OFICIAL DO GOOGLE (Google Identity Services)
+    // Por que existe: no login por redirecionamento, a tela do Google
+    // mostrava "Sign in to xpjiqtyumspnfkpqcrlh.supabase.co" (o endereço
+    // técnico do banco). Com o botão oficial, a janelinha do Google abre
+    // a partir do NOSSO site e mostra "comunicaa.vercel.app" / o nome do app.
+    //
+    // Parábola: antes, a pessoa ia até a portaria do prédio vizinho (o
+    // Supabase) buscar o crachá. Agora o Google entrega o crachá na nossa
+    // própria recepção, e nós só pedimos ao Supabase para validar.
+    //
+    // Passo a passo:
+    //  1. carrega o script oficial do Google;
+    //  2. cria um "nonce" (número usado uma única vez) contra reaproveitamento;
+    //  3. o Google devolve um "id_token" (prova de identidade assinada);
+    //  4. signInWithIdToken entrega a prova ao Supabase, que cria a sessão.
+    // Se o script do Google não carregar, o botão antigo (redirecionamento)
+    // continua aparecendo como reserva.
+    // -----------------------------------------------------------------
+    async prepararBotaoGoogle(caixa, botaoReserva, aoErro) {
+      const idCliente = (window.CAA_CONFIG || {}).googleClientId;
+      if (!idCliente || !caixa || !CAA.db) return;
+      try {
+        await carregarScriptGoogle();
+        const nonceBruto = crypto.randomUUID() + crypto.randomUUID();
+        const nonceHash = await sha256Hex(nonceBruto);
+        window.google.accounts.id.initialize({
+          client_id: idCliente,
+          nonce: nonceHash,             // o Google recebe o nonce "embaralhado"
+          ux_mode: 'popup',
+          context: 'signin',
+          itp_support: true,
+          use_fedcm_for_button: true,
+          callback: async (resposta) => {
+            const { error } = await CAA.db.auth.signInWithIdToken({
+              provider: 'google',
+              token: resposta.credential,
+              nonce: nonceBruto,        // o Supabase recebe o original e confere
+            });
+            if (error) { if (aoErro) aoErro(error); return; }
+            window.location.replace('index.html');
+          },
+        });
+        const largura = Math.min(400, Math.max(220, Math.round(caixa.getBoundingClientRect().width || 320)));
+        window.google.accounts.id.renderButton(caixa, {
+          type: 'standard', theme: 'outline', size: 'large', shape: 'pill',
+          text: 'continue_with', logo_alignment: 'center', width: largura, locale: 'pt-BR',
+        });
+        if (botaoReserva) botaoReserva.hidden = true;
+      } catch (erro) {
+        console.warn('Botão oficial do Google indisponível; usando o login por redirecionamento.', erro);
+      }
+    },
+
     // Sair: devolve o crachá e limpa o que ficou guardado nesta aba.
     async sair() {
       try { await CAA.db.auth.signOut(); } catch (erro) { /* mesmo com erro de rede, seguimos para o login */ }
@@ -148,6 +202,26 @@
       window.location.replace('login.html?saiu=1');
     },
   };
+
+  // Carrega o script oficial do Google uma única vez (com limite de 6 s).
+  function carregarScriptGoogle() {
+    return new Promise((resolver, rejeitar) => {
+      if (window.google && window.google.accounts && window.google.accounts.id) { resolver(); return; }
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client?hl=pt-BR'; // hl = idioma do botão
+      script.async = true;
+      script.onload = () => resolver();
+      script.onerror = () => rejeitar(new Error('script do Google não carregou'));
+      document.head.append(script);
+      setTimeout(() => rejeitar(new Error('tempo esgotado')), 6000);
+    });
+  }
+
+  // SHA-256 em hexadecimal (o "embaralhador" do nonce), feito pelo próprio navegador.
+  async function sha256Hex(texto) {
+    const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto));
+    return Array.from(new Uint8Array(bytes), (b) => b.toString(16).padStart(2, '0')).join('');
+  }
 
   // Aviso amigável quando o config.js ainda não foi preenchido.
   function mostrarErroConfiguracao() {
