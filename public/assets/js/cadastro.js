@@ -117,7 +117,8 @@
       const email = $('email').value.trim().toLowerCase();
       const senha = $('senha').value;
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Digite um e-mail válido.');
-      if (senha.length < 8) throw new Error('A senha precisa ter pelo menos 8 caracteres.');
+      const problema = CAA.problemaNaSenha(senha);
+      if (problema) throw new Error(problema);
       if (senha !== $('senha-2').value) throw new Error('As duas senhas não são iguais.');
 
       const { data, error } = await CAA.db.auth.signUp({

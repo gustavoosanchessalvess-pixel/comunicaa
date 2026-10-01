@@ -23,6 +23,7 @@
   <script src="assets/js/interface.js" defer></script>
   <script src="assets/js/voz.js" defer></script>
   <script src="assets/js/catalogo.js" defer></script>
+  <script src="assets/js/graficos.js" defer></script>
   <script src="assets/js/dicionario.js" defer></script>
 </head>
 <body>
@@ -32,25 +33,84 @@
   <div class="principal">
     <header class="topo">
       <div>
-        <h1 class="saudacao">Dicionário</h1>
-        <p class="subtitulo">O que foi comunicado, dia a dia.</p>
+        <h1 class="saudacao" id="titulo-pagina">Progresso</h1>
+        <p class="subtitulo" id="subtitulo-pagina">Acompanhe a comunicação no dia a dia.</p>
       </div>
       <div class="topo-acoes">
+        <div id="periodo" class="segmentos periodo" role="group" aria-label="Período">
+          <button type="button" data-dias="7" aria-pressed="true">7 dias</button>
+          <button type="button" data-dias="30" aria-pressed="false">30 dias</button>
+          <button type="button" data-dias="90" aria-pressed="false" class="so-profissional">90 dias</button>
+        </div>
+        <button id="exportar" class="botao azul pequeno so-profissional" type="button"><i class="bi bi-filetype-csv" aria-hidden="true"></i> Exportar</button>
+        <button id="imprimir" class="botao neutro pequeno so-profissional" type="button"><i class="bi bi-printer-fill" aria-hidden="true"></i> Imprimir</button>
       </div>
     </header>
 
     <main id="conteudo">
-      <!-- RESUMO EM LINGUAGEM SIMPLES (sem gráficos, a pedido das profissionais) -->
-      <section class="painel" aria-labelledby="titulo-resumo">
+      <!-- RESUMO EM LINGUAGEM SIMPLES -->
+      <section class="painel resumo-painel" aria-labelledby="titulo-resumo">
         <h2 id="titulo-resumo">Resumo</h2>
         <p id="resumo" class="resumo-texto">Carregando…</p>
-        <p class="texto-2 pequeno">Registro de uso para a família e os profissionais. Não é uma avaliação clínica.</p>
       </section>
+
+      <!-- NÚMEROS PRINCIPAIS -->
+      <section id="numeros" class="numeros" aria-label="Indicadores do período"></section>
+
+      <div class="colunas">
+        <section class="painel" aria-labelledby="titulo-frequencia">
+          <h2 id="titulo-frequencia">Frases por dia</h2>
+          <p class="texto-2 pequeno">Com que frequência a prancha foi usada.</p>
+          <div id="grafico-frequencia" class="grafico-caixa"></div>
+        </section>
+        <section class="painel" aria-labelledby="titulo-funcoes">
+          <h2 id="titulo-funcoes">Para que se comunicou</h2>
+          <p class="texto-2 pequeno">Funções comunicativas das frases do período.</p>
+          <div id="funcoes" class="tipos"></div>
+        </section>
+      </div>
+
+      <!-- SÓ PARA O PROFISSIONAL -->
+      <div class="colunas so-profissional">
+        <section class="painel" aria-labelledby="titulo-media">
+          <h2 id="titulo-media">Tamanho médio da frase</h2>
+          <p class="texto-2 pequeno">Média de figuras por frase, por semana (12 semanas). Subir de 1 para 2+ indica combinações.</p>
+          <div id="grafico-media" class="grafico-caixa"></div>
+        </section>
+        <section class="painel" aria-labelledby="titulo-vocab-acum">
+          <h2 id="titulo-vocab-acum">Vocabulário acumulado</h2>
+          <p class="texto-2 pequeno">Total de figuras diferentes já usadas, semana a semana.</p>
+          <div id="grafico-vocabulario" class="grafico-caixa"></div>
+        </section>
+      </div>
+      <div class="colunas so-profissional">
+        <section class="painel" aria-labelledby="titulo-classes">
+          <h2 id="titulo-classes">Classes de palavras</h2>
+          <p class="texto-2 pequeno">Pela chave de cores de Fitzgerald (ações, pessoas, objetos...).</p>
+          <div id="classes" class="tipos"></div>
+        </section>
+        <section class="painel" aria-labelledby="titulo-horarios">
+          <h2 id="titulo-horarios">Horários de uso</h2>
+          <p class="texto-2 pequeno">Em que parte do dia a comunicação acontece.</p>
+          <div id="horarios" class="tipos"></div>
+        </section>
+      </div>
 
       <section class="painel" aria-labelledby="titulo-vocabulario">
         <h2 id="titulo-vocabulario">Figuras que mais aparecem</h2>
-        <p class="texto-2 pequeno">Toque numa figura para ouvir.</p>
+        <p class="texto-2 pequeno">No período escolhido. Toque numa figura para ouvir.</p>
         <div id="vocabulario" class="vocabulario"></div>
+      </section>
+
+      <!-- SÓ PARA O RESPONSÁVEL: orientações gerais -->
+      <section class="painel dicas so-responsavel" aria-labelledby="titulo-dicas">
+        <h2 id="titulo-dicas">Dicas para a família</h2>
+        <ul>
+          <li><b>Use a prancha junto.</b> Mostre você também as figuras quando fala ("Eu" + "quero" + "água"): a criança aprende vendo.</li>
+          <li><b>Crie oportunidades no dia a dia.</b> Lanche, banho e brincadeiras são ótimos momentos para pedir e escolher.</li>
+          <li><b>Valorize cada tentativa.</b> Responda logo ao que foi comunicado. Compare só com ela mesma, nunca com outras crianças.</li>
+          <li><b>Leve estes dados às consultas.</b> Eles ajudam o fonoaudiólogo e o psicólogo a ajustar os objetivos.</li>
+        </ul>
       </section>
 
       <section class="painel" aria-labelledby="titulo-historico">
@@ -58,6 +118,8 @@
         <div id="historico" class="historico"></div>
         <div class="mais"><button id="mais-historico" class="botao neutro" type="button" hidden>Ver frases mais antigas</button></div>
       </section>
+
+      <p class="nota-metodo">Registro de uso da plataforma: não é avaliação nem diagnóstico. Indicadores inspirados nas práticas de acompanhamento de CAA (frequência de uso, vocabulário, tamanho da frase e funções comunicativas).</p>
     </main>
 
     <footer class="rodape">Comunicar é conectar. <i class="bi bi-heart-fill" aria-hidden="true"></i> · <a href="creditos.html">Créditos</a></footer>

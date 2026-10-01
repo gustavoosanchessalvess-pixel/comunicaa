@@ -489,7 +489,7 @@ dialog.folha::backdrop { background: rgba(0, 0, 0, .28); backdrop-filter: blur(4
 .frase-texto:empty { display: none; }
 
 /* "Preciso dizer": atalhos que ficam sempre à mão. */
-.atalhos { display: flex; align-items: center; gap: 10px; margin: 18px 0 6px; overflow-x: auto; padding: 4px 2px 8px; }
+.atalhos { display: flex; align-items: center; gap: 10px; margin: 18px 0 6px; overflow-x: auto; padding: 4px 2px 12px; }
 .atalhos-titulo { font-weight: 900; color: var(--texto-2); font-size: 14px; white-space: nowrap; }
 .atalhos-lista { display: flex; gap: 10px; }
 .atalho {
@@ -499,7 +499,7 @@ dialog.folha::backdrop { background: rgba(0, 0, 0, .28); backdrop-filter: blur(4
   box-shadow: 0 4px 0 var(--vermelho-sombra);
   transition: transform 90ms ease, box-shadow 90ms ease;
 }
-.atalho img { width: 40px; height: 40px; border-radius: 10px; background: #fff; object-fit: contain; }
+.atalho img { width: 52px; height: 52px; border-radius: 12px; background: #fff; object-fit: contain; padding: 2px; }
 .atalho:active { transform: translateY(4px); box-shadow: 0 0 0 var(--vermelho-sombra); }
 
 /* Barra de busca + categorias em "pílulas" roláveis. */
@@ -509,7 +509,7 @@ dialog.folha::backdrop { background: rgba(0, 0, 0, .28); backdrop-filter: blur(4
 }
 .busca .bi { position: absolute; left: 16px; color: var(--texto-3); font-size: 18px; pointer-events: none; }
 .busca input { padding-left: 46px; background: var(--superficie); }
-.chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 8px; scrollbar-width: thin; }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px; scrollbar-width: thin; }
 .chip {
   flex-shrink: 0; min-height: 42px; padding: 8px 16px;
   border: 0; border-radius: 30px; background: var(--superficie); color: var(--texto);
@@ -625,7 +625,7 @@ dialog.folha::backdrop { background: rgba(0, 0, 0, .28); backdrop-filter: blur(4
 /* ---------------------------------------------------------------------
    8. DICIONÁRIO (progresso e histórico)
    --------------------------------------------------------------------- */
-.numeros { display: grid; gap: 14px; grid-template-columns: repeat(4, 1fr); }
+.numeros { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 20px; }
 .numero {
   padding: 18px; border-radius: var(--raio-grande); background: var(--superficie);
   box-shadow: var(--sombra-leve); display: grid; gap: 4px;
@@ -651,7 +651,7 @@ dialog.folha::backdrop { background: rgba(0, 0, 0, .28); backdrop-filter: blur(4
 .dia small { font-size: 12px; font-weight: 800; color: var(--texto-2); }
 
 .tipos { display: grid; gap: 10px; margin-top: 8px; }
-.tipo-linha { display: grid; grid-template-columns: 120px 1fr 36px; align-items: center; gap: 10px; font-weight: 800; font-size: 14px; }
+.tipo-linha { display: grid; grid-template-columns: 150px 1fr 74px; align-items: center; gap: 10px; font-weight: 800; font-size: 14px; }
 .tipo-linha .trilho { height: 12px; border-radius: 12px; background: var(--superficie-2); overflow: hidden; }
 .tipo-linha .trilho i { display: block; height: 100%; border-radius: 12px; background: var(--cor-tipo); transition: width 600ms ease; }
 .t-pedido { --cor-tipo: var(--verde); }
@@ -722,11 +722,10 @@ dialog.folha::backdrop { background: rgba(0, 0, 0, .28); backdrop-filter: blur(4
 }
 
 /* Tablet em pé / notebook pequeno: menu vira abas embaixo. */
-@media (max-width: 960px) {
+@media (max-width: 767px) {
   .lateral { display: none; }
   .abas { display: grid; }
   .principal { margin-left: 0; padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-  .numeros { grid-template-columns: repeat(2, 1fr); }
   .colunas { grid-template-columns: 1fr; }
 }
 
@@ -825,7 +824,7 @@ body.crianca .frase-texto { display: none; }
 body.crianca .frase-faixa { min-height: 104px; }
 body.crianca .frase-acoes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 body.crianca .frase-acoes .falar { grid-column: auto; }
-body.crianca .atalhos { margin: 0; padding: 0; }
+body.crianca .atalhos { margin: 0; padding: 2px 2px 8px; overflow: visible; }
 body.crianca .atalhos-lista { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; width: 100%; }
 body.crianca .atalhos-titulo { display: none; }
 body.crianca .atalho { justify-content: center; min-height: 56px; }
@@ -887,3 +886,72 @@ button.palavra-usada { cursor: pointer; font: inherit; }
 .entrada-cartao.largo .divisor { margin: 10px 0; }
 .cadastro-grade { gap: 8px 16px; }
 .cadastro-grade .campo { gap: 4px; }
+
+
+/* =====================================================================
+   13. PROGRESSO / RELATÓRIOS (gráficos e visão por perfil)
+   ===================================================================== */
+body:not(.visao-profissional) .so-profissional { display: none !important; }
+body.visao-profissional .so-responsavel { display: none !important; }
+.periodo { min-width: 240px; }
+.resumo-painel { border-left: 6px solid var(--verde); }
+.numero small.variacao { font-size: 12px; font-weight: 800; }
+.variacao.sobe { color: var(--verde-sombra); }
+.variacao.desce { color: var(--vermelho-sombra); }
+.variacao.igual { color: var(--texto-3); }
+.grafico-caixa { margin-top: 10px; }
+.grafico { width: 100%; height: auto; display: block; }
+.g-grade { stroke: var(--linha); stroke-width: 1; }
+.g-eixo { fill: var(--texto-2); font-size: 12px; font-weight: 700; font-family: inherit; }
+.g-valor { fill: var(--texto); font-size: 12px; font-weight: 900; font-family: inherit; }
+.g-barra { fill: var(--verde); }
+.g-barra.destaque { fill: var(--azul); }
+.g-linha { fill: none; stroke: var(--azul); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+.g-area { fill: var(--azul); opacity: .1; }
+.g-ponto { fill: #fff; stroke: var(--azul); stroke-width: 3; }
+.dicas ul { margin: 10px 0 0; padding-left: 20px; display: grid; gap: 10px; line-height: 1.5; }
+.dicas { border-left: 6px solid var(--amarelo); }
+.nota-metodo { color: var(--texto-3); font-size: 13px; font-weight: 700; text-align: center; margin: 22px auto 0; max-width: 760px; }
+.selo-perfil { display: inline-block; margin-top: 2px; padding: 1px 8px; border-radius: 10px; color: #fff !important; font-weight: 900 !important; }
+.selo-perfil.p-responsavel { background: var(--verde); }
+.selo-perfil.p-profissional { background: var(--azul); }
+.selo-perfil.p-autista { background: var(--roxo); }
+.topo-acoes .segmentos { background: #e9e9ee; }
+
+/* Modo Criança em telas grandes: logo grande à esquerda (sem as abas de adulto). */
+@media (min-width: 1024px) {
+  body.crianca .lateral { display: flex !important; }
+  body.crianca .lateral .menu, body.crianca .lateral .conta { display: none; }
+  body.crianca .principal { margin-left: var(--largura-menu); }
+}
+
+/* Impressão do relatório (botão Imprimir do profissional) */
+@media print {
+  .lateral, .abas, .topo-acoes, .registro-acoes, .mais, .pular, .toast { display: none !important; }
+  .principal { margin: 0 !important; padding: 0 !important; }
+  body { background: #fff; }
+  .painel, .numero { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+  .colunas { grid-template-columns: 1fr 1fr; }
+}
+
+/* Tablet: painéis lado a lado viram um embaixo do outro. */
+@media (max-width: 1100px) { .colunas { grid-template-columns: 1fr; } }
+
+.periodo { display: flex; min-width: 0; }
+.periodo button { padding: 0 16px; white-space: nowrap; }
+.conta-texto .selo-perfil { font-size: 11px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+body:not(.visao-profissional) .numeros { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+body.visao-profissional .numeros { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { body .numeros { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+
+/* Faixa da frase: quando o espaço é pouco, os botões vão para baixo (nada espremido). */
+@media (max-width: 1100px) {
+  .frase-painel { grid-template-columns: 1fr; }
+  .frase-acoes { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .frase-acoes .falar, .frase-acoes .salvar { grid-column: auto; min-height: 54px; font-size: 17px; }
+  body.crianca .frase-acoes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+/* Nomes das pastas: quebram por sílaba em vez de serem cortados. */
+.pasta span { hyphens: auto; -webkit-hyphens: auto; overflow-wrap: break-word; font-size: clamp(16px, 2.3vw, 22px); }
+.atalho span { white-space: nowrap; }

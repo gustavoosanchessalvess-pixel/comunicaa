@@ -29,7 +29,10 @@
   // Atalhos para os elementos da página (document.getElementById = "ache pelo id").
   const $ = (id) => document.getElementById(id);
 
-  CAA.iniciarPaginaInterna('casa', async () => {
+  CAA.iniciarPaginaInterna('casa', async (usuario) => {
+    // Texto do topo conforme o perfil (o profissional usa a prancha nas sessões).
+    const subtitulo = document.querySelector('.topo .subtitulo');
+    if (subtitulo && usuario.perfil === 'profissional') subtitulo.textContent = 'Prancha para usar nas sessões de atendimento.';
     catalogo = await CAA.catalogo.carregar();
     try { minhas = await CAA.catalogo.minhasFiguras(catalogo); } catch (erro) { minhas = []; }
 

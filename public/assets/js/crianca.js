@@ -54,7 +54,10 @@
   function medidas() {
     const nivel = CAA.modoCrianca.nivel();
     const [estreita, larga] = LAYOUT[nivel] || LAYOUT[2];
-    return window.innerWidth < 700 ? estreita : larga;
+    // Usa a largura REAL da área das figuras (não a da janela): com o menu
+    // aberto ao lado, a área é menor e cabem menos colunas.
+    const largura = document.getElementById('grade-crianca').getBoundingClientRect().width || window.innerWidth;
+    return largura < 640 ? estreita : larga;
   }
 
   function desenhar() {

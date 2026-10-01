@@ -18,7 +18,7 @@ Plataforma web gratuita de **Comunicação Aumentativa e Alternativa (CAA)** com
 | **Casa (Modo Adulto)** | Tocar nas figuras monta a frase; **Falar** lê em voz alta; **Salvar** guarda no banco. Tem atalhos "Preciso dizer" (Não, Me ajuda, Pausa, Banheiro), busca e categorias. Figuras sempre grandes. |
 | **Casa (Modo Criança)** | Estilo Matraquinha: tela inteira, pastas grandes com figura, figuras em páginas (sem rolar), nível de apoio escolhido pelo adulto, "Falar" já salva no histórico e cadeado dos pais (segurar 2 s para sair). Abre sempre para o perfil "Pessoa autista". |
 | **Tabelas** | Todas as categorias do banco (assuntos e cores das palavras) e a tabela pessoal **"Minhas figuras"** (as figuras mais usadas pela própria pessoa). Tocar abre a prancha filtrada. |
-| **Dicionário** | Para a família: resumo em uma frase, figuras que mais aparecem e histórico por dia com "Ouvir" e "Apagar" (sem gráficos ou notas, a pedido das profissionais). |
+| **Progresso / Relatórios** | Responsável: resumo, indicadores, gráfico de frases por dia, funções comunicativas, figuras mais usadas, dicas e histórico. Profissional: tudo isso + 90 dias, comparação com o período anterior, evolução semanal, vocabulário acumulado, classes de palavras, horários, exportar CSV e imprimir. |
 
 ## Tecnologias
 

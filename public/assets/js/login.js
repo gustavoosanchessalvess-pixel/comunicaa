@@ -111,7 +111,8 @@
   $('form-nova-senha').addEventListener('submit', async (evento) => {
     evento.preventDefault();
     const senha = $('nova-senha').value;
-    if (senha.length < 8) { avisar('A senha precisa ter pelo menos 8 caracteres.', 'erro'); return; }
+    const problema = CAA.problemaNaSenha(senha);
+    if (problema) { avisar(problema, 'erro'); return; }
     if (senha !== $('nova-senha-2').value) { avisar('As duas senhas não são iguais.', 'erro'); return; }
     const { error } = await CAA.db.auth.updateUser({ password: senha });
     if (error) { avisar(CAA.mensagemErro(error), 'erro'); return; }

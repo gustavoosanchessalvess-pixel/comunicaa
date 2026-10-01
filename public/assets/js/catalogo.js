@@ -1,37 +1,37 @@
-﻿// =====================================================================
-// catalogo.js Â· BUSCA AS FIGURAS PECS NO BANCO E MONTA OS CARTÃ•ES
+// =====================================================================
+// catalogo.js · BUSCA AS FIGURAS PECS NO BANCO E MONTA OS CARTÕES
 // ---------------------------------------------------------------------
-// LÃª trÃªs tabelas do DER:
+// Lê três tabelas do DER:
 //   CATEGORIA ....... os assuntos (Comidas, Sentimentos...) e as cores
 //   PALAVRAS_PECS ... as figuras (texto + imagem)
-//   TEM ............. qual figura estÃ¡ em qual categoria (e em que ordem)
+//   TEM ............. qual figura está em qual categoria (e em que ordem)
 //
-// ParÃ¡bola: Ã© como montar um ÃLBUM DE FIGURINHAS. PALAVRAS_PECS sÃ£o
-// as figurinhas, CATEGORIA sÃ£o as pÃ¡ginas do Ã¡lbum, e TEM diz em qual
-// pÃ¡gina cada figurinha deve ser colada (e em qual posiÃ§Ã£o).
+// Parábola: é como montar um ÁLBUM DE FIGURINHAS. PALAVRAS_PECS são
+// as figurinhas, CATEGORIA são as páginas do álbum, e TEM diz em qual
+// página cada figurinha deve ser colada (e em qual posição).
 // =====================================================================
 'use strict';
 
 (function () {
   // Categorias especiais que representam a CHAVE DE CORES de Fitzgerald.
-  // Os nomes sÃ£o exatamente os mesmos gravados no banco (migraÃ§Ã£o 3).
+  // Os nomes são exatamente os mesmos gravados no banco (migração 3).
   // "classe" vira a classe CSS da borda colorida (ex.: cl-verbo = verde).
   const CLASSES = {
-    'Classe: ExpressÃµes sociais e preposiÃ§Ãµes': { classe: 'social',      rotulo: 'ExpressÃµes sociais', cor: 'rosa' },
+    'Classe: Expressões sociais e preposições': { classe: 'social',      rotulo: 'Expressões sociais', cor: 'rosa' },
     'Classe: Pessoas e pronomes':               { classe: 'pessoa',      rotulo: 'Pessoas e pronomes', cor: 'amarelo' },
-    'Classe: AÃ§Ãµes e verbos':                   { classe: 'verbo',       rotulo: 'AÃ§Ãµes e verbos', cor: 'verde' },
+    'Classe: Ações e verbos':                   { classe: 'verbo',       rotulo: 'Ações e verbos', cor: 'verde' },
     'Classe: Objetos e substantivos':           { classe: 'substantivo', rotulo: 'Objetos e substantivos', cor: 'laranja' },
     'Classe: Qualidades e adjetivos':           { classe: 'adjetivo',    rotulo: 'Qualidades e adjetivos', cor: 'azul' },
     'Classe: Perguntas':                        { classe: 'pergunta',    rotulo: 'Perguntas', cor: 'roxo' },
-    'Classe: AdvÃ©rbios':                        { classe: 'adverbio',    rotulo: 'AdvÃ©rbios', cor: 'marrom' },
+    'Classe: Advérbios':                        { classe: 'adverbio',    rotulo: 'Advérbios', cor: 'marrom' },
     'Classe: Recusa, ajuda e desconforto':      { classe: 'importante',  rotulo: 'Recusa, ajuda e desconforto', cor: 'vermelho' },
-    'Classe: Outros sÃ­mbolos':                  { classe: 'diverso',     rotulo: 'Outros sÃ­mbolos', cor: 'branco' },
+    'Classe: Outros símbolos':                  { classe: 'diverso',     rotulo: 'Outros símbolos', cor: 'branco' },
   };
   const NOME_MAIS_USADOS = 'Mais usados no dia a dia';
-  const CHAVE_CACHE = 'caa-catalogo-v2'; // troque o número quando o catálogo do banco mudar
-  const TAMANHO_LOTE = 1000; // o Supabase entrega no mÃ¡ximo 1000 linhas por pedido
+  const CHAVE_CACHE = 'caa-catalogo-v3'; // troque o número quando o catálogo do banco mudar
+  const TAMANHO_LOTE = 1000; // o Supabase entrega no máximo 1000 linhas por pedido
 
-  // Busca TODAS as linhas de uma tabela, de 1000 em 1000 (paginaÃ§Ã£o).
+  // Busca TODAS as linhas de uma tabela, de 1000 em 1000 (paginação).
   async function buscarTudo(tabela, colunas, ordem) {
     const linhas = [];
     for (let inicio = 0; ; inicio += TAMANHO_LOTE) {
@@ -45,7 +45,7 @@
     return linhas;
   }
 
-  // Organiza as linhas cruas do banco em algo fÃ¡cil de usar na tela.
+  // Organiza as linhas cruas do banco em algo fácil de usar na tela.
   function organizar(categoriasBanco, palavrasBanco, temBanco) {
     const palavras = new Map();   // id_palavra -> figura
     const categorias = new Map(); // id_categoria -> categoria
@@ -55,7 +55,7 @@
         id: p.id_palavra,
         texto: p.txt_palavra,
         imagem: p.imagem_pecs,
-        classe: 'diverso', // cor padrÃ£o; trocada abaixo se a figura tiver classe
+        classe: 'diverso', // cor padrão; trocada abaixo se a figura tiver classe
         busca: CAA.normalizar(p.txt_palavra),
       });
     });
@@ -91,10 +91,10 @@
     return { palavras, categorias };
   }
 
-  // Guarda o catÃ¡logo nesta aba (sessionStorage) para as outras telas
+  // Guarda o catálogo nesta aba (sessionStorage) para as outras telas
   // abrirem instantaneamente, sem baixar tudo de novo.
   function salvarCache(bruto) {
-    try { sessionStorage.setItem(CHAVE_CACHE, JSON.stringify(bruto)); } catch (erro) { /* sem espaÃ§o: tudo bem */ }
+    try { sessionStorage.setItem(CHAVE_CACHE, JSON.stringify(bruto)); } catch (erro) { /* sem espaço: tudo bem */ }
   }
   function lerCache() {
     try { return JSON.parse(sessionStorage.getItem(CHAVE_CACHE)); } catch (erro) { return null; }
@@ -103,7 +103,7 @@
   CAA.catalogo = {
     CLASSES,
 
-    // Carrega o catÃ¡logo (do cache ou do banco) e devolve:
+    // Carrega o catálogo (do cache ou do banco) e devolve:
     // { palavras: Map, categorias: Map, maisUsados, assuntos, classes, todas }
     async carregar() {
       let bruto = lerCache();
@@ -128,28 +128,28 @@
       };
     },
 
-    // Procura uma figura pelo texto exato (ignora acentos/maiÃºsculas).
+    // Procura uma figura pelo texto exato (ignora acentos/maiúsculas).
     acharPorTexto(catalogo, texto) {
       const alvo = CAA.normalizar(texto);
       for (const palavra of catalogo.palavras.values()) if (palavra.busca === alvo) return palavra;
       return null;
     },
 
-    // Cria o botÃ£o de uma figura PECS (imagem + texto + borda colorida).
+    // Cria o botão de uma figura PECS (imagem + texto + borda colorida).
     criarCartao(palavra, aoTocar) {
       const botao = CAA.el('button', 'cartao cl-' + palavra.classe);
       botao.type = 'button';
       botao.dataset.id = palavra.id;
       const imagem = document.createElement('img');
       imagem.src = palavra.imagem;
-      imagem.alt = ''; // o texto logo abaixo jÃ¡ descreve a figura
+      imagem.alt = ''; // o texto logo abaixo já descreve a figura
       imagem.width = 256;
       imagem.height = 256;
-      imagem.loading = 'lazy';   // sÃ³ baixa a imagem quando ela aparece na tela
+      imagem.loading = 'lazy';   // só baixa a imagem quando ela aparece na tela
       imagem.decoding = 'async';
       botao.append(imagem, CAA.el('strong', '', palavra.texto));
       botao.addEventListener('click', () => {
-        // Reinicia a animaÃ§Ã£o de "toque" mesmo em toques seguidos.
+        // Reinicia a animação de "toque" mesmo em toques seguidos.
         botao.classList.remove('tocado');
         void botao.offsetWidth;
         botao.classList.add('tocado');
@@ -159,14 +159,14 @@
     },
 
     // -----------------------------------------------------------------
-    // "MINHAS FIGURAS": a tabela pessoal de cada usuÃ¡rio.
-    // NÃ£o existe coluna de "dono" na CATEGORIA (o DER nÃ£o tem), entÃ£o a
-    // tabela pessoal Ã© CALCULADA a partir das frases que a prÃ³pria pessoa
-    // salvou (CRIA + CONTEM), pela funÃ§Ã£o minhas_frases (que sÃ³ devolve
-    // as frases dela, por causa do RLS). As mais usadas vÃªm primeiro.
+    // "MINHAS FIGURAS": a tabela pessoal de cada usuário.
+    // Não existe coluna de "dono" na CATEGORIA (o DER não tem), então a
+    // tabela pessoal é CALCULADA a partir das frases que a própria pessoa
+    // salvou (CRIA + CONTEM), pela função minhas_frases (que só devolve
+    // as frases dela, por causa do RLS). As mais usadas vêm primeiro.
     //
-    // ParÃ¡bola: Ã© a "gaveta de brinquedos favoritos": ninguÃ©m precisa
-    // arrumar; ela se enche sozinha com o que a crianÃ§a mais usa.
+    // Parábola: é a "gaveta de brinquedos favoritos": ninguém precisa
+    // arrumar; ela se enche sozinha com o que a criança mais usa.
     // -----------------------------------------------------------------
     async minhasFiguras(catalogo, limite = 36) {
       const { data, error } = await CAA.db.rpc('minhas_frases', { p_limite: 500 });

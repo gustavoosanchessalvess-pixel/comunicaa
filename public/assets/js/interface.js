@@ -13,11 +13,23 @@
 'use strict';
 
 (function () {
-  const PAGINAS = [
-    { id: 'casa',       href: 'index.html',      nome: 'Casa',       icone: 'house-door-fill', cor: 'i-casa' },
-    { id: 'tabelas',    href: 'tabelas.html',    nome: 'Tabelas',    icone: 'grid-3x3-gap-fill', cor: 'i-tabelas' },
-    { id: 'dicionario', href: 'dicionario.html', nome: 'Dicionário', icone: 'book-half',       cor: 'i-dicionario' },
-  ];
+  // Os nomes do menu mudam conforme o PERFIL (tabela USUARIO):
+  //   responsável .... Casa · Tabelas · Progresso   (linguagem da família)
+  //   profissional ... Prancha · Tabelas · Relatórios (linguagem de atendimento)
+  const NOMES = {
+    responsavel:  { casa: 'Casa',    dicionario: 'Progresso',  iconeDados: 'graph-up-arrow' },
+    profissional: { casa: 'Prancha', dicionario: 'Relatórios', iconeDados: 'clipboard2-data-fill' },
+    autista:      { casa: 'Casa',    dicionario: 'Dicionário', iconeDados: 'book-half' },
+  };
+  function paginasDo(perfil) {
+    const n = NOMES[perfil] || NOMES.responsavel;
+    return [
+      { id: 'casa',       href: 'index.html',      nome: n.casa,       icone: 'house-door-fill',   cor: 'i-casa' },
+      { id: 'tabelas',    href: 'tabelas.html',    nome: 'Tabelas',    icone: 'grid-3x3-gap-fill', cor: 'i-tabelas' },
+      { id: 'dicionario', href: 'dicionario.html', nome: n.dicionario, icone: n.iconeDados,        cor: 'i-dicionario' },
+    ];
+  }
+  CAA.nomesDoPerfil = (perfil) => NOMES[perfil] || NOMES.responsavel;
 
   CAA.montarEstrutura = function (paginaAtual, usuario) {
     // ---------- MENU LATERAL ----------
@@ -37,6 +49,8 @@
 
     const menu = CAA.el('nav', 'menu');
     menu.setAttribute('aria-label', 'Menu principal');
+    const PAGINAS = paginasDo(usuario.perfil);
+    document.body.dataset.perfil = usuario.perfil; // o CSS pode mudar detalhes por perfil
     PAGINAS.forEach((pagina) => {
       const link = CAA.el('a');
       link.href = pagina.href;
@@ -54,7 +68,7 @@
     const textoConta = CAA.el('div', 'conta-texto');
     textoConta.append(
       CAA.el('strong', '', usuario.nome_completo),
-      CAA.el('small', '', CAA.auth.PERFIS[usuario.perfil] || ''),
+      CAA.el('small', 'selo-perfil p-' + usuario.perfil, CAA.auth.PERFIS[usuario.perfil] || ''),
     );
     const botaoSair = CAA.el('button', 'botao-icone');
     botaoSair.type = 'button';

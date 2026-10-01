@@ -114,7 +114,7 @@ window.CAA = window.CAA || {};
     if (/Invalid login credentials/i.test(texto)) return 'E-mail ou senha incorretos.';
     if (/Email not confirmed/i.test(texto)) return 'Confirme seu e-mail pelo link que enviamos antes de entrar.';
     if (/User already registered/i.test(texto)) return 'Este e-mail já tem conta. Use "Entrar".';
-    if (/Password should be|password.*characters/i.test(texto)) return 'A senha precisa ter pelo menos 8 caracteres.';
+    if (/Password should|password.*(characters|contain)|weak/i.test(texto)) return 'Senha fraca: use 8 ou mais caracteres, com letra maiúscula, minúscula e número.';
     if (/rate limit|too many/i.test(texto)) return 'Muitas tentativas seguidas. Espere um minuto e tente de novo.';
     if (/provider is not enabled|Unsupported provider/i.test(texto)) return 'O login com Google ainda não foi ativado no Supabase.';
     if (/JWT|session/i.test(texto)) return 'Sua sessão expirou. Entre novamente.';
@@ -135,6 +135,14 @@ window.CAA = window.CAA || {};
   CAA.chaveDia = function (data) {
     const d = new Date(data);
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  };
+
+  // Regra de senha (a mesma configurada no Supabase): 8+ caracteres,
+  // com letra minúscula, letra maiúscula e número. Devolve o problema ou ''.
+  CAA.problemaNaSenha = function (senha) {
+    if (senha.length < 8) return 'A senha precisa ter pelo menos 8 caracteres.';
+    if (!/[a-z]/.test(senha) || !/[A-Z]/.test(senha) || !/[0-9]/.test(senha)) return 'A senha precisa ter letra minúscula, letra MAIÚSCULA e número.';
+    return '';
   };
 
   // Tira acentos e deixa minúsculo: "Água" -> "agua" (para a busca achar).

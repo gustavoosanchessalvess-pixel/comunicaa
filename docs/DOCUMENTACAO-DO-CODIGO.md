@@ -193,7 +193,11 @@ Ela existe porque está no DER, mas **fica sempre vazia (NULL)**, e o próprio b
 - **Chave secreta nunca no site**: o script `gerar-config.mjs` **recusa** a chave secreta, se alguém colar por engano.
 - **XSS (injeção de código)**: textos são colocados na tela com `textContent`, nunca com `innerHTML`. Se alguém digitar `<script>` no nome, aparece como texto.
 - **Cabeçalhos de segurança** (`vercel.json`): *Content-Security-Policy* (só roda código do próprio site), *HSTS* (sempre HTTPS), *X-Frame-Options* (ninguém coloca o CAA dentro de outro site para enganar), entre outros.
-- **Bibliotecas locais**: ícones, fonte e supabase-js ficam dentro do projeto; o site não baixa código de servidores desconhecidos.
+- **Bibliotecas locais**: ícones, fonte e supabase-js ficam dentro do projeto; o site não baixa código de servidores desconhecidos (a única exceção é o script oficial do Google para o botão de login, liberado só para `accounts.google.com/gsi`).
+- **Senha forte**: 8+ caracteres com letra minúscula, MAIÚSCULA e número (regra no Supabase e conferida também na tela).
+- **MFA (TOTP)** ativado no projeto Supabase (pronto para uso futuro com app autenticador).
+- **Cross-Origin-Opener-Policy**: isola a janela do site (permitindo apenas o pop-up do Google).
+- **Limitação conhecida**: a verificação automática de senhas vazadas (Have I Been Pwned) só existe no plano pago do Supabase; o "Security Advisor" mostra esse aviso.
 
 ---
 
@@ -300,13 +304,21 @@ A frase em construção fica guardada na aba (`sessionStorage`): se a pessoa for
 ### 7.8b `tabelas.js`: a estante
 Mostra cada **categoria** como um cartão (capa com 3 figuras + quantidade). Duas seções: **Assuntos** e **Cores das palavras**. Tocar abre `index.html?categoria=ID`, e a Casa já abre filtrada.
 
-### 7.9 `dicionario.js`: o caderninho da família
-Chama `minhas_frases()` e mostra, em linguagem simples (**sem gráficos, notas ou comparações**, como pediram as profissionais que acompanham o projeto):
-- um **resumo em uma frase** ("Nos últimos 7 dias, foram feitas 5 frases. As figuras que mais aparecem são...");
-- **figuras que mais aparecem** (tocar numa figura faz ouvir);
-- **histórico separado por dia** (Hoje, Ontem...), com **Ouvir** e **Apagar** (apagar a FRASE apaga CRIA e CONTEM junto, pelo *cascade*).
+### 7.9 `dicionario.js` + `graficos.js`: Progresso (responsável) e Relatórios (profissional)
+A mesma página muda conforme o **perfil**:
 
-> Não é avaliação clínica: mostra o **uso**, para a família e os profissionais acompanharem a evolução.
+| | Responsável → **Progresso** | Profissional → **Relatórios** |
+|---|---|---|
+| Período | 7 ou 30 dias | 7, 30 ou 90 dias |
+| Resumo em uma frase | ✔ | ✔ |
+| Indicadores | frases, dias com uso, figuras diferentes, média de figuras por frase | os mesmos + **% de frases com 2+ figuras**, **figuras novas** e **comparação com o período anterior** (▲▼) |
+| Gráficos | frases por dia, funções comunicativas | + **tamanho médio da frase por semana**, **vocabulário acumulado**, **classes de palavras**, **horários de uso** |
+| Extras | **Dicas para a família** | **Exportar CSV** e **Imprimir relatório** |
+
+**Por que esses números?** São os indicadores usados por fonoaudiólogos e psicólogos para acompanhar CAA: **frequência de uso**, **vocabulário** (figuras diferentes), **tamanho da frase** (passar de 1 figura para combinações de 2 ou mais é sinal de avanço) e **funções comunicativas** (pedir, perguntar, avisar necessidade, se expressar). Tudo é **calculado** a partir das tabelas do DER (FRASE, CRIA, CONTEM, TEM): nenhuma tabela nova. A comparação é sempre da pessoa com ela mesma, nunca com outras crianças.
+
+- `graficos.js` desenha os gráficos em **SVG** (sem biblioteca externa): barras, linha e barras horizontais. *Parábola:* desenhar no caderno quadriculado, com régua.
+- **Exportar CSV**: protegido contra "CSV injection" (textos que começam com `=`, `+`, `-`, `@` ganham um apóstrofo para a planilha não executá-los como fórmula).
 
 ### 7.10 `login.js` e `cadastro.js`
 - **login.js**: botões do Google e de e-mail/senha, "Esqueci minha senha" e a tela de nova senha (`login.html?redefinir=1`).
@@ -429,7 +441,13 @@ Em PECS/CAA os cartões costumam ser palavras curtas e concretas (de preferênci
 **17. "Algumas figuras estavam cortadas. O que foi feito?"**
 Algumas figuras recortadas do PDF tinham pedaços de palavras cortadas, riscos da tabela do PDF e pontinhos soltos. Um script limpou 110 figuras (as originais estão guardadas em `backups/pcs-original`). "SOBRE" e "BASTANTE" têm a primeira/última letra encostada na borda e só poderiam ser refeitas com o PDF original.
 
-**18. "Onde o site está hospedado?"**
+**18. "Qual a diferença entre responsável e profissional?"**
+O menu e a página de dados mudam: o responsável vê **Progresso** (linguagem simples, gráficos principais e dicas para a família); o profissional vê **Relatórios** (mais indicadores, evolução semanal, classes de palavras, horários, comparação com o período anterior, exportar CSV e imprimir). A prancha do profissional se chama **Prancha** ("para usar nas sessões").
+
+**19. "Como as figuras ficaram maiores?"**
+O script `scripts/limpar-figuras.py` parte das originais e: apaga textos cortados, riscos da tabela do PDF e marcas de corte; refaz dois círculos que o PDF cortou (espelhando a metade de cima); e recorta o quadrado em volta do desenho. O desenho passou de ~69% para ~87% do cartão.
+
+**20. "Onde o site está hospedado?"**
 Na **Vercel** (front-end) e no **Supabase**, região São Paulo (banco e login). O código está no **GitHub**.
 
 ---
